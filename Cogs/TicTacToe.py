@@ -4,8 +4,15 @@ from discord.ext import commands
 class TicTacToe(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
+        
+        ## ==> THESE TWO VARIABLES ARE FOR STORING DATA OF THE USERS
+        ###############################################################################
+        
         self.MEMBER_DATA = {}
         self.BOARDS = {}
+        
+        ###############################################################################
+        
         self.DEFAULT_BOARD = [
             ":white_large_square:",":white_large_square:",":white_large_square:",
             ":white_large_square:",":white_large_square:",":white_large_square:",
@@ -15,7 +22,7 @@ class TicTacToe(commands.Cog):
     ## ==> TO ASK A PLAYER FOR A GAME
     ##############################################################################################################################################################
     
-    @commands.command()
+    @commands.command(aliases=["TTT","TicTacToe"])
     async def ttt(self, ctx: commands.Context, p2: commands.MemberConverter) -> None:
        
         ## ==> CHECKS
@@ -84,7 +91,7 @@ Use `c.unaccept @{ctx.author}` to unaccept the invite
 
         ###############################################################################
         
-        ## ==> TIMER
+        ## ==> TO TIMEOUT THE GAME INVITE IF P2 DIDN'T ACCEPT IT
         ###############################################################################
         
         await asyncio.sleep(15)
@@ -103,7 +110,7 @@ Use `c.unaccept @{ctx.author}` to unaccept the invite
     ## ==> TO ACCEPT A GAME
     ##############################################################################################################################################################
     
-    @commands.command()
+    @commands.command(aliases=["Accept"])
     async def accept(self, ctx: commands.Context, p1: commands.MemberConverter) -> None:
         
         ## ==> TO CHECK IF P2 ASKED FOR A GAME OR IS AVAILABLE TO PLAY
@@ -140,6 +147,9 @@ Bring it On!
         embed_.set_author(name=ctx.author,icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed_)
         
+        ## ==> CHANGING DATA IN THE VARIABLES FOR GAME
+        ###############################################################################
+        
         self.MEMBER_DATA[p1.id] = {"askingGame":False,"askingGameTo":None,"inGame":True,"inGameWith":ctx.author.id,"requestedToPlay":False,"requestedToPlayBy":None}
         self.MEMBER_DATA[ctx.author.id] = {"askingGame":False,"askingGameTo":None,"inGame":True,"inGameWith":p1.id,"requestedToPlay":False,"requestedToPlayBy":None}
         
@@ -147,51 +157,74 @@ Bring it On!
         self.BOARDS[p1.id] = {"BOARD":self.DEFAULT_BOARD.copy(),"OPPONENT":ctx.author.id,"MARK":"o","IN_TURN":False,"POS":1,"EXIT":False}
         
         ###############################################################################
+        
+        ###############################################################################
     
     ##############################################################################################################################################################
     ## ==> EXIT
 
-    @commands.command()
+    @commands.command(aliases=["Exit","Quit","quit"])
     async def exit(self,ctx: commands.Context,p2:commands.MemberConverter) -> None:
-      if ctx.author.id not in self.MEMBER_DATA.keys():
-        await ctx.send("You're not playing")
-        return
-      else:
-        if self.MEMBER_DATA[ctx.author.id]["inGame"] and self.MEMBER_DATA[ctx.author.id]["inGameWith"]!= p2.id:
-          await ctx.send("That user is not the one you want to quit playing with")
-          return
-        elif self.MEMBER_DATA[ctx.author.id]["inGame"] and self.MEMBER_DATA[ctx.author.id]["inGameWith"] == p2.id: pass        
+        
+        ## ==> CHECKS
+        ###############################################################################
+        
+        if ctx.author.id not in self.MEMBER_DATA.keys():
+            await ctx.send("You're not playing")
+            return
         else:
-          await ctx.send("You're not playing")
-          return
+            if self.MEMBER_DATA[ctx.author.id]["inGame"] and self.MEMBER_DATA[ctx.author.id]["inGameWith"]!= p2.id:
+                await ctx.send("That user is not the one you want to quit playing with")
+                return
+            elif self.MEMBER_DATA[ctx.author.id]["inGame"] and self.MEMBER_DATA[ctx.author.id]["inGameWith"] == p2.id: pass        
+            else:
+                await ctx.send("You're not playing")
+                return
           
-      if p2.id not in self.MEMBER_DATA.keys():
-        await ctx.send("You're not playing")
-        return
-      else:
-        if self.MEMBER_DATA[p2.id]["inGame"] and self.MEMBER_DATA[p2.id]["inGameWith"]!= ctx.author.id:
-          await ctx.send("That user is not playing with you")
-          return
-        elif self.MEMBER_DATA[p2.id]["inGame"] and self.MEMBER_DATA[p2.id]["inGameWith"] == ctx.author.id: pass
+        if p2.id not in self.MEMBER_DATA.keys():
+            await ctx.send("You're not playing")
+            return
         else:
-          await ctx.send("You're not playing")
-          return
+            if self.MEMBER_DATA[p2.id]["inGame"] and self.MEMBER_DATA[p2.id]["inGameWith"]!= ctx.author.id:
+                await ctx.send("That user is not playing with you")
+                return
+            elif self.MEMBER_DATA[p2.id]["inGame"] and self.MEMBER_DATA[p2.id]["inGameWith"] == ctx.author.id: pass
+            else:
+                await ctx.send("You're not playing")
+                return
+            
+        ###############################################################################
 
-      self.BOARDS[ctx.author.id]["EXIT"] = True
+        ## ==> TO CHANGE SET EXIT VOTE TRUE FOR AUTHOR
+        ###############################################################################
+        
+        self.BOARDS[ctx.author.id]["EXIT"] = True
+        
+        ###############################################################################
 
-      if self.BOARDS[p2.id]["EXIT"]:
-        DESC = f"""
-The match between {p2.mention} and {ctx.author.mention} has been exited
-"""
-        del self.MEMBER_DATA[ctx.author.id],self.MEMBER_DATA[p2.id],self.BOARDS[ctx.author.id], self.BOARDS[p2.id]
-      else:
-        DESC = f"""
+        ## ==> TO CHECK IF P2 HAS VOTED TO EXIT TOO
+        ###############################################################################
+        
+        if self.BOARDS[p2.id]["EXIT"]:
+            DESC = f"""
+    The match between {p2.mention} and {ctx.author.mention} has been exited
+    """
+            del self.MEMBER_DATA[ctx.author.id],self.MEMBER_DATA[p2.id],self.BOARDS[ctx.author.id], self.BOARDS[p2.id]
+        else:
+            DESC = f"""
 {p2.mention}, {ctx.author.mention} wants to end the match
-Use `c.exit` to exit or ignore this message to continue
-"""
-      embed_ = discord.Embed(title="TIC TAC TOE",description=DESC,color=discord.Color.red())
+Use `>exit` to exit or ignore this message to continue
+""" 
+        ###############################################################################
+        
+        ## ==> TO SEND EMBED
+        ###############################################################################
+        
+        embed_ = discord.Embed(title="TIC TAC TOE",description=DESC,color=discord.Color.red())
 
-      await ctx.send(embed=embed_)
+        await ctx.send(embed=embed_)
+        
+        ###############################################################################
       
 
     ##############################################################################################################################################################
@@ -201,7 +234,7 @@ Use `c.exit` to exit or ignore this message to continue
     ## ==> UNACCEPT THE INVITATION
     ##############################################################################################################################################################
     
-    @commands.command()
+    @commands.command(aliases=["Unaccept","Decline","decline"])
     async def unaccept(self, ctx: commands.Context, p1: commands.MemberConverter) -> None:
         
         ## ==> TO CHECK IF P2 ASKED FOR A GAME OR IS AVAILABLE TO PLAY
@@ -247,14 +280,17 @@ Why not try someone else?
     ## ==> PLACE
     ##############################################################################################################################################################
     
-    @commands.command()
+    @commands.command(aliases=["Place","set"])
     async def place(self, ctx: commands.Context, no: int):
+        
+        ## ==> CHECKS
+        ###############################################################################
+        
         if ctx.author.id in self.BOARDS.keys(): pass
         else:
             await ctx.send("You are not playing")
             return
         
-        OtherP = self.BOARDS[ctx.author.id]["OPPONENT"]
            
         if no not in [1,2,3,4,5,6,7,8,9]:
             await ctx.send("That is an invalid number")
@@ -266,15 +302,36 @@ Why not try someone else?
             return
 
         if self.BOARDS[ctx.author.id]["BOARD"][no-1] != ":white_large_square:":
-          await ctx.send("That place is already occupied")
-          return
+            await ctx.send("That place is already occupied")
+            return
+      
+        ###############################################################################
         
+        ## ==> OPPONENT
+        ###############################################################################
+        
+        OtherP = self.BOARDS[ctx.author.id]["OPPONENT"]
+        
+        ###############################################################################
+        
+        ## ==> CHANGING THE VALUE ON THE BOARD
+        ###############################################################################
+
         self.BOARDS[ctx.author.id]["BOARD"][no-1] = f":regional_indicator_{self.BOARDS[ctx.author.id]['MARK']}:"
         self.BOARDS[OtherP]["BOARD"][no-1] = f":regional_indicator_{self.BOARDS[ctx.author.id]['MARK']}:"
         
+        ###############################################################################
+        
+        ## ==> MAKING OPPONENT'S TURN TRUE
+        ###############################################################################
         
         self.BOARDS[ctx.author.id]["IN_TURN"] = False
         self.BOARDS[OtherP]["IN_TURN"] = True
+        
+        ###############################################################################
+        
+        ## ==> CURRENT BOARD
+        ###############################################################################
         
         board_temp = [
             self.BOARDS[ctx.author.id]['BOARD'][0],self.BOARDS[ctx.author.id]['BOARD'][1],self.BOARDS[ctx.author.id]['BOARD'][2],
@@ -282,15 +339,24 @@ Why not try someone else?
             self.BOARDS[ctx.author.id]['BOARD'][6],self.BOARDS[ctx.author.id]['BOARD'][7],self.BOARDS[ctx.author.id]['BOARD'][8]
         ]
         
+        ###############################################################################
+        
+        ## ==> BOARD FOR SENDING IN CHANNEL
+        ###############################################################################
+
         boardprint = f"""
 {self.BOARDS[ctx.author.id]['BOARD'][0]} {self.BOARDS[ctx.author.id]['BOARD'][1]} {self.BOARDS[ctx.author.id]['BOARD'][2]}
 {self.BOARDS[ctx.author.id]['BOARD'][3]} {self.BOARDS[ctx.author.id]['BOARD'][4]} {self.BOARDS[ctx.author.id]['BOARD'][5]}  
 {self.BOARDS[ctx.author.id]['BOARD'][6]} {self.BOARDS[ctx.author.id]['BOARD'][7]} {self.BOARDS[ctx.author.id]['BOARD'][8]} 
 """
+        ###############################################################################
         
         await ctx.send(boardprint)
         x = ":regional_indicator_x:"
         o = ":regional_indicator_o:"
+        
+        ## ==> CHECKING WINNER
+        ##############################################################################################################################################################
         
         ## ==> X, VERTICAL
         ###############################################################################
@@ -422,6 +488,8 @@ Why not try someone else?
             await ctx.send("Match Draw")
             del self.MEMBER_DATA[ctx.author.id],self.MEMBER_DATA[OtherP]
             del self.BOARDS[ctx.author.id],self.BOARDS[OtherP]
+        
+        ##############################################################################################################################################################
         
         try:
             self.BOARDS[ctx.author.id]["POS"] += 1

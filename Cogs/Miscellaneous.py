@@ -23,6 +23,7 @@ class Miscellaneous(commands.Cog):
         
         embed.add_field(
             name=":partying_face: **WELCOMER**",
+            inline=False,
             value="""
 **[ᴀᴅᴍɪɴɪꜱᴛʀᴀᴛᴏʀ ᴏɴʟʏ]**
 
@@ -39,6 +40,35 @@ class Miscellaneous(commands.Cog):
     Mention channel as #<channel name>
 """
         )
+        
+        embed.add_field(
+            name=":game_die: TIC TAC TOE",
+            inline=False,
+            value="""
+--------------------------------------------------------------------------------------
+
+:video_game: `>ttt <user>`:
+    To Start a game of Tic Tac Toe with <user>
+    Other Aliases of this command: `>TTT`, `>TicTacToe`
+    
+:thumbsup: `>accept <user>`:
+    To Accept an invitation for Tic Tac Toe with <user>
+    Other Aliases: `>Accept`
+
+:thumbsdown: `>unaccept <user>`:
+    To Unaccept an invitation for Tic Tac Toe with <user>
+    Other Aliases: `>Unaccept`, `>decline`
+    
+:negative_squared_cross_mark: `>exit <user>`:
+    To Force Exit a match between author and <user> [Requires both players to run the command]
+    Other Aliases: `>Exit`, `>quit`
+    
+:white_check_mark: `>place <number>`
+    To Place an X or O on <number> on the board
+    Other Aliases: `>Place`, `>set`
+"""
+        )
+        
         await ctx.send(embed=embed)
     
     #############################################################################################
