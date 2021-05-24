@@ -4,6 +4,11 @@ Please check [PR creation guide](https://github.com/hackarmour/discord-assistant
 
 ### Main contributors: 
 
+<<<<<<< HEAD
 [[ᴛʜᴇ ᴇᴍᴘᴇʀᴏʀ]](https://github.com/TheEmperor342)
 
 _______________________________________
+=======
+[0xᴇᴍᴘᴇʀᴏʀ](https://github.com/TheEmperor342)
+
+>>>>>>> 907780cdfe682977780378a5b4c62c9bdbc61afb
