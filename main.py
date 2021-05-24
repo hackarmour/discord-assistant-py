@@ -1,9 +1,7 @@
 #############################################################################################
 #
-# This is a Welcomer Discord Bot which is obviously written in Python   
-# It is customizable and sends messages which are inputted by an administrator.
-# You can run help command to see all its command after you enter the Token in the file 
-# "config.json"
+# This is an open source Discord Bot which is obviously written in Python   
+# enter the Token in the file "config.json"
 #
 #  Happy Codings,
 #   ~ TheEmperor342 and PhantomKnight287
@@ -52,7 +50,7 @@ async def on_ready(): print("The Bot is Ready")
 #     else:
 #         bot.unload_extension(F"Cogs.{cog}")
 #         bot.load_extension(F"Cogs.{cog}")
-    
+
 #############################################################################################
 
 ## ==> RUNNING THE BOT

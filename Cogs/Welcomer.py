@@ -1,7 +1,6 @@
 import discord, json
 from discord.ext import commands
 
-## MEMBER LEAVE IS NOT YET DONE
 
 class Welcomer(commands.Cog):
     def __init__(self,bot: commands.Bot) -> None:
@@ -25,13 +24,13 @@ class Welcomer(commands.Cog):
                 channel = self.bot.get_channel(self.CONFIG[str(ctx.guild.id)]["channel"])
                 await channel.send(self.CONFIG[str(ctx.guild.id)]["welcome_message"].replace("|user|",ctx.mention).replace("|guild|",str(ctx.guild)))
     
-    # @commands.Cog.listener()
-    # async def on_member_leave(self,ctx) -> None:
-    #     if str(ctx.guild.id) in self.CONFIG.keys():
-    #         if self.CONFIG[str(ctx.guild.id)]["channel"] != None and self.CONFIG[str(ctx.guild.id)]["welcome_message"] != None and self.CONFIG[str(ctx.guild.id)]["leave_message"] != None and self.CONFIG[str(ctx.guild.id)]["active"]:
-    #             channel = self.bot.get_channel(self.CONFIG[str(ctx.guild.id)]["channel"])
-    #             await channel.send(self.CONFIG[str(ctx.guild.id)]["leave_message"].replace("|user|",str(ctx)).replace("|guild|",str(ctx.guild)))
-    
+    @commands.Cog.listener()
+    async def on_member_remove(self,ctx) -> None:
+        if str(ctx.guild.id) in self.CONFIG.keys():
+            if self.CONFIG[str(ctx.guild.id)]["channel"] != None and self.CONFIG[str(ctx.guild.id)]["welcome_message"] != None and self.CONFIG[str(ctx.guild.id)]["leave_message"] != None and self.CONFIG[str(ctx.guild.id)]["active"]:
+                channel = self.bot.get_channel(self.CONFIG[str(ctx.guild.id)]["channel"])
+                await channel.send(self.CONFIG[str(ctx.guild.id)]["leave_message"].replace("|user|",str(ctx)).replace("|guild|",str(ctx.guild)))
+                
     #############################################################################################
         
     ## ==> TO TOGGLE WELCOMER
@@ -87,25 +86,25 @@ class Welcomer(commands.Cog):
     ## ==> TO SET LEAVE MESSAGE
     #############################################################################################
     
-    # @commands.command()
-    # @commands.has_permissions(administrator=True)
-    # async def SetLeaveMessage(self,ctx: commands.Context,*, msg: str) -> None:
-    #     if not msg.lower().__contains__("|user|"):
-    #         await ctx.send("Please enter `|user|` keyword in your message")
-    #         return
-    #     else:
-    #         if str(ctx.guild.id) not in self.CONFIG.keys():
-    #             self.CONFIG[str(ctx.guild.id)] = {
-    #                 "active": False,
-    #                 "welcome_message": None,
-    #                 "leave_message": msg,
-    #                 "channel": None
-    #             }
-    #         else: self.CONFIG[str(ctx.guild.id)]["leave_message"] = msg
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def SetLeaveMessage(self,ctx: commands.Context,*, msg: str) -> None:
+        if not msg.lower().__contains__("|user|"):
+            await ctx.send("Please enter `|user|` keyword in your message")
+            return
+        else:
+            if str(ctx.guild.id) not in self.CONFIG.keys():
+                self.CONFIG[str(ctx.guild.id)] = {
+                    "active": False,
+                    "welcome_message": None,
+                    "leave_message": msg,
+                    "channel": None
+                }
+            else: self.CONFIG[str(ctx.guild.id)]["leave_message"] = msg
             
-    #         with open("WelcomerConfig.json",'w') as f: f.write(json.dumps(self.CONFIG))
+            with open("WelcomerConfig.json",'w') as f: f.write(json.dumps(self.CONFIG))
             
-    #         await ctx.send(embed=discord.Embed(color=discord.Color.green(),description=f":white_check_mark: Leave Message Updated!\nSet to: {msg.replace('|user|',ctx.author.mention).replace('|guild|', str(ctx.guild))}",title="WELCOMER"))
+            await ctx.send(embed=discord.Embed(color=discord.Color.green(),description=f":white_check_mark: Leave Message Updated!\nSet to: {msg.replace('|user|',ctx.author.mention).replace('|guild|', str(ctx.guild))}",title="WELCOMER"))
 
     #############################################################################################
                
