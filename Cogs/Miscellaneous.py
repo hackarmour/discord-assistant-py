@@ -34,10 +34,17 @@ class Miscellaneous(commands.Cog):
     To Set the Welcome Message
     Using `|user|` in message will replace it with a mention of the new user    -> Important
     Using `|guild|` in message will replace it with the name of the server
+
+:scroll: `>SetLeaveMessage <message>`:
+    To Set the Leave Message
+    Using `|user|` in message will replace it with User's Name                  -> Important
+    Using `|guild|` in message will replace it with Server's Name
     
 :dart: `>SetChannel <Channel>`:
     To Set the channel to send Welcome message in
     Mention channel as #<channel name>
+    
+--------------------------------------------------------------------------------------
 """
         )
         
@@ -45,8 +52,6 @@ class Miscellaneous(commands.Cog):
             name=":game_die: TIC TAC TOE",
             inline=False,
             value="""
---------------------------------------------------------------------------------------
-
 :video_game: `>ttt <user>`:
     To Start a game of Tic Tac Toe with <user>
     Other Aliases of this command: `>TTT`, `>TicTacToe`
