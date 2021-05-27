@@ -1,14 +1,17 @@
-import discord, platform, datetime, requests
+import discord, sys, datetime, requests, json
 from discord.ext import commands
 from random import choice
 from time import time
+from os import listdir
 
 class Miscellaneous(commands.Cog):
     def __init__(self,bot: commands.Bot) -> None: 
         self.bot = bot
+        with open("Configuration/config.json") as f:
+            self.STARTTIME = json.loads(f.read())["starttime"]
         
         self.EIGHT_BALL_ANSWERS = [
-            "Yeah", "Yes", "Ofcourse", "Ofc", "Ah Yes",
+            "Yeah", "Yes", "Ofcourse", "Ofc", "Ah Yes", "I see in the Prophecy: TRUE!"
             "Nah", "No", 'Nope', 'Never', "I don't think so",
             "idk", "Maybe", "ig", "I'm bored", "You're annoying"
         ]
@@ -25,16 +28,26 @@ class Miscellaneous(commands.Cog):
     #############################################################################################
     
     @commands.command()
-    async def help(self, ctx: commands.Context) -> None:
+    async def help(self, ctx: commands.Context,*,thing=None) -> None:
         embed = discord.Embed(title="HELP",color=ctx.author.color)
         embed.set_footer(text="Developed By [ᴛʜᴇ ᴇᴍᴘᴇʀᴏʀ] and PHÄÑTÖM KÑÏGHT")
         
-        embed.add_field(
-            name=":partying_face: **WELCOMER**",
-            inline=False,
-            value="""
-**[ᴀᴅᴍɪɴɪꜱᴛʀᴀᴛᴏʀ ᴏɴʟʏ]**
-
+        if thing == None:
+            embed.add_field(
+                name="What do you want help with?",
+                value="Type any of the commands below to get help:",
+                inline=False
+            )
+            embed.add_field(name="`>help Welcomer`",value="To Get Help with Welcomer Commands")
+            embed.add_field(name="`>help Moderation`",value="To Get Help with Moderation Commands")
+            embed.add_field(name="`>help Tic Tac Toe`",value="To Get Help with Tic Tac Toe Commands")
+            embed.add_field(name="`>help Fun`",value="To Get Help with Fun Commands")
+        
+        elif thing.lower() == "welcomer":
+            embed.add_field(
+                name="**WELCOMER**",
+                inline=False,
+                value="""          
 :white_check_mark: `>toggleWelcomer`:
     To Toggle Welcomer On or Off
 
@@ -51,15 +64,14 @@ class Miscellaneous(commands.Cog):
 :dart: `>setWelcomeChannel <Channel>`:
     To Set the channel to send Welcome message in
     Mention channel as #<channel name>
-    
---------------------------------------------------------------------------------------
-"""
-        )
+    """
+            )
         
-        embed.add_field(
-            name=":game_die: TIC TAC TOE",
-            inline=False,
-            value="""
+        elif thing.lower() == "tic tac toe":
+            embed.add_field(
+                name="TIC TAC TOE",
+                inline=False,
+                value="""
 :video_game: `>ttt <user>`:
     To Start a game of Tic Tac Toe with <user>
     Other Aliases of this command: `>TTT`, `>TicTacToe`
@@ -79,13 +91,13 @@ class Miscellaneous(commands.Cog):
 :white_check_mark: `>place <number>`
     To Place an X or O on <number> on the board
     Other Aliases: `>Place`, `>set`
-    
---------------------------------------------------------------------------------------
 """
-        )
-        embed.add_field(
-            name="MODERATION",
-            value="""
+            )
+        
+        elif thing.lower() == "moderation":
+            embed.add_field(
+                name="MODERATION",
+                value="""
 :x: `>ban <user>`
     To Ban <user>
     
@@ -103,15 +115,17 @@ class Miscellaneous(commands.Cog):
     To Toggle Logs
     It will not send logs until this is not done
     
---------------------------------------------------------------------------------------
+:x: `>purge <number>`
+    It will clear <number> amount of messages
+    Other aliases: `>clear`, `>delete`
 """,
-            inline=False
-        )
-
-        embed.add_field(
-            name="FUN",
-            inline=False,
-            value="""
+                inline=False
+            )
+        elif thing.lower() == "fun":
+            embed.add_field(
+                name="FUN",
+                inline=False,
+                value="""
 :thinking_face: `>8ball <question>`
     Give a random answer for <question>
     
@@ -121,7 +135,10 @@ class Miscellaneous(commands.Cog):
 :rofl: `>memes <number>`
     Sends <number> amount of memes!!
 """
-        )
+            )
+        
+        else:
+            embed.add_field(name="I can't Understand what do you mean", value="Use just `>help` without any arguements")
         
         await ctx.send(embed=embed)
     
@@ -143,13 +160,14 @@ class Miscellaneous(commands.Cog):
     
     @commands.command()
     async def stats(self,ctx: commands.Context) -> None:
-        pyver = str(platform.version())
-        embed_ = discord.Embed(title="STATS",color=ctx.author.color)
-        embed_.add_field(name="Uptime",value=str(datetime.timedelta(seconds=int(round(time() - self.STARTTIME)))))
-        embed_.add_field(name="Ping",value=f"{round(self.bot.latency * 1000)}ms")
-        embed_.add_field(name="Discord.py version",value=discord.__version__)
-        embed_.add_field(name="Python Version",value=pyver)
-        embed_.add_field(name="Server",value=ctx.guild)
+        pyver = str(sys.version[:6])
+        embed_ = discord.Embed(title="STATS",color=ctx.author.color,inline=False)
+        embed_.add_field(inline=False,name="Uptime",value=str(datetime.timedelta(seconds=int(round(time() - self.STARTTIME)))))
+        embed_.add_field(inline=False,name="Ping",value=f"{round(self.bot.latency * 1000)}ms")
+        embed_.add_field(inline=False,name="Discord.py version",value=discord.__version__)
+        embed_.add_field(inline=False,name="Python Version",value=pyver)
+        embed_.add_field(inline=False,name="Server",value=ctx.guild)
+        embed_.set_thumbnail(url=ctx.guild.icon_url)
         await ctx.send(embed = embed_)
 
     #############################################################################################

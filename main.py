@@ -17,6 +17,7 @@
 
 import discord, json, os
 from discord.ext import commands
+from time import time
 
 #############################################################################################
 
@@ -39,7 +40,14 @@ for i in os.listdir("Cogs"):
         bot.load_extension(F"Cogs.{i[:-3]}")
 
 @bot.event
-async def on_ready(): print("The Bot is Ready")
+async def on_ready(): 
+    print("The Bot is Ready")
+    with open("Configuration/config.json") as f:
+        config = json.loads(f.read())
+        config["starttime"] = time()
+        
+    with open("Configuration/config.json", 'w') as f:
+        f.write(json.dumps(config))
 
 ## You can uncomment this function and put all the id's of users whom you want which will be able to reload cogs
 # @bot.command()
