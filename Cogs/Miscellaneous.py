@@ -1,7 +1,7 @@
-import discord, sys, datetime, requests, json
+import discord, sys, datetime, requests, json, time
 from discord.ext import commands
 from random import choice
-from time import time
+
 
 class Miscellaneous(commands.Cog):
     def __init__(self,bot: commands.Bot) -> None: 
@@ -161,7 +161,7 @@ class Miscellaneous(commands.Cog):
     async def stats(self,ctx: commands.Context) -> None:
         pyver = str(sys.version[:6])
         embed_ = discord.Embed(title="STATS",color=ctx.author.color,inline=False)
-        embed_.add_field(inline=False,name="Uptime",value=str(datetime.timedelta(seconds=int(round(time() - self.STARTTIME)))))
+        embed_.add_field(inline=False,name="Uptime",value=str(datetime.timedelta(seconds=int(round(time.time() - self.STARTTIME)))))
         embed_.add_field(inline=False,name="Ping",value=f"{round(self.bot.latency * 1000)}ms")
         embed_.add_field(inline=False,name="Discord.py version",value=discord.__version__)
         embed_.add_field(inline=False,name="Python Version",value=pyver)

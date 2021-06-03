@@ -17,7 +17,7 @@
 
 import discord, json, os
 from discord.ext import commands
-from time import time
+import datetime, time
 
 #############################################################################################
 
@@ -44,7 +44,7 @@ async def on_ready():
     print("The Bot is Ready")
     with open("Configuration/config.json") as f:
         config = json.loads(f.read())
-        config["starttime"] = float(time())
+        config["starttime"] = time.time()
         
     with open("Configuration/config.json", 'w') as f:
         f.write(json.dumps(config))
