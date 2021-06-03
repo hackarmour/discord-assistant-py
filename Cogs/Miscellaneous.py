@@ -159,32 +159,9 @@ class Miscellaneous(commands.Cog):
     
     @commands.command()
     async def stats(self,ctx: commands.Context) -> None:
-        timediff = str(datetime.timedelta(seconds=int(round(time.time() - self.STARTTIME))))
-        timearray = timediff.split(':')
-    # Someone please make this better. This should work for the time being.
-        if(timearray[0] > 1):
-            hour = timearray[0] + " hours"
-        elif(timearray[0] == 1):
-            hour = timearray[0] + " hour"
-        else:
-            hour = ""
-
-        if(timearray[1] > 1):
-            minute = timearray[1] + " minutes"
-        elif(timearray[1] == 1):
-            minute = timearray[1] + " minute"
-        else:
-            minute = ""
-        if(timearray[1] > 1):
-            second = timearray[2] + " seconds"
-        elif(timearray[1] == 1):
-            second = timearray[1] + " second"
-        else:
-            second = ""                     
-
         pyver = str(sys.version[:6])
         embed_ = discord.Embed(title="STATS",color=ctx.author.color,inline=False)
-        embed_.add_field(inline=False,name="Uptime",value= hour + minute + second)
+        embed_.add_field(inline=False,name="Uptime",value=str(datetime.timedelta(seconds=int(round(time.time() - self.STARTTIME)))))
         embed_.add_field(inline=False,name="Ping",value=f"{round(self.bot.latency * 1000)}ms")
         embed_.add_field(inline=False,name="Discord.py version",value=discord.__version__)
         embed_.add_field(inline=False,name="Python Version",value=pyver)
