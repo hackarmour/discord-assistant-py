@@ -164,20 +164,20 @@ class Miscellaneous(commands.Cog):
     # Someone please make this better. This should work for the time being.
         if(timearray[0] > 1):
             hour = timearray[0] + " hours"
-        else if(timearray[0] == 1):
+        elif(timearray[0] == 1):
             hour = timearray[0] + " hour"
         else:
             hour = ""
 
         if(timearray[1] > 1):
             minute = timearray[1] + " minutes"
-        else if(timearray[1] == 1):
+        elif(timearray[1] == 1):
             minute = timearray[1] + " minute"
         else:
             minute = ""
         if(timearray[1] > 1):
             second = timearray[2] + " seconds"
-        else if(timearray[1] == 1):
+        elif(timearray[1] == 1):
             second = timearray[1] + " second"
         else:
             second = ""                     
