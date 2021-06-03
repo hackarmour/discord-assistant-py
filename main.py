@@ -35,9 +35,7 @@ with open("Configuration/config.json") as f:
 bot = commands.Bot(command_prefix=">", intents=discord.Intents.all(),case_insensitive=True)
 bot.remove_command("help")
 
-for i in os.listdir("Cogs"):
-    if i.endswith(".py"):
-        bot.load_extension(F"Cogs.{i[:-3]}")
+
 
 @bot.event
 async def on_ready(): 
@@ -48,7 +46,11 @@ async def on_ready():
         
     with open("Configuration/config.json", 'w') as f:
         f.write(json.dumps(config))
-    
+        
+for i in os.listdir("Cogs"):
+    if i.endswith(".py"):
+        bot.load_extension(F"Cogs.{i[:-3]}")   
+
 @bot.command()
 async def reload(ctx,cog):
     if ctx.author.id in [754894159403286531, 510480545160101898]:
