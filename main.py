@@ -69,9 +69,9 @@ async def reload(ctx,cog):
 
 @bot.listen()
 async def on_message(message):
-    await increase_xp(message,bot)
+    await increase_xp(message,bot)#This  function gives 5xp to user  on each message sent. 
 
-
+#This function connects the database to the main.py file so that the level data of users can be stored. It will make a database itself.
 async def connect_db():
     connection = await aiosqlite.connect("leveling.db")
     bot.db = connection
