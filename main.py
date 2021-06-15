@@ -18,6 +18,8 @@
 import discord, json, os
 from discord.ext import commands
 from time import time
+import aiosqlite
+from dislevel import increase_xp
 
 #############################################################################################
 
@@ -65,10 +67,25 @@ async def reload(ctx,cog):
 
 #############################################################################################
 
+@bot.listen()
+async def on_message(message):
+    await increase_xp(message,bot)
+
+
+async def connect_db():
+    connection = await aiosqlite.connect("leveling.db")
+    bot.db = connection
+
+os.environ['DISLEVEL_DB_CONN'] = 'db'
+
+bot.loop.run_until_complete(connect_db())
+
+# Loading the cog/extension so we can use the functionality
+bot.load_extension('dislevel')
 ## ==> RUNNING THE BOT
 #############################################################################################
 
 if __name__ == "__main__":
-    bot.run(TOKEN)
+    bot.run('ODM5ODQ5MTQyOTI1NjU2MDY0.YJPodw.zTgx5Gk_52EeOcVNOz177T-dUas')
 
 #############################################################################################
