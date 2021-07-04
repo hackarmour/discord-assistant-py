@@ -99,6 +99,7 @@ class Miscellaneous(commands.Cog):
             embed.add_field(name="`>help Tic Tac Toe`",value="To Get Help with Tic Tac Toe Commands")
             embed.add_field(name="`>help Fun`",value="To Get Help with Fun Commands")
             embed.add_field(name="`>help Miscellaneous`", value="To Get Help with Other Commands")
+            embed.add_field(name='`>help nqn`',value='To get help with NQN commands.')
 
 
 
@@ -225,6 +226,13 @@ class Miscellaneous(commands.Cog):
     Sends <number> amount of memes!!
 """
             )
+        elif thing.lower()=='nqn':
+            embed.add_field(name='NQN',inline=False,value="""
+:partying_face:`>n <emoji name>`
+    Send that emoji in chat without nitro
+:partying_face:`>nall` 
+    To get the list of all the emojis.
+""")
 
         else:
             embed.add_field(name="I can't Understand what do you mean", value="Use just `>help` without any arguements")
