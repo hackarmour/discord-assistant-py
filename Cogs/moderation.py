@@ -44,6 +44,24 @@ class Logs(commands.Cog):
             
         elif (self.bot.user in message.mentions):
             await message.channel.send(embed=discord.Embed(title=f"Hi! I'm {str(self.bot.user)[:-5]}", description="You can use `>help` to get help with my commands",color=message.author.color))
+        elif (list(message.content.split(' '))[0]=='.l' and str(message.author.id) in ['510480545160101898','746434554558021694']):
+            with open("Configuration/emojis.json") as f:
+                allEmojis=json.load(f)
+                allJsonKeys=list(allEmojis.keys())
+            if (list(message.content.split(' '))[1]) in allJsonKeys:
+                emoji=allEmojis[list(message.content.split(' '))[1]]
+                webhook=await message.channel.create_webhook(name='Assistant')
+                if (message.author.nick!=None):
+                    name=message.author.nick
+                elif (message.author.nick==None):
+                    name=message.author.name
+                await webhook.send(emoji,username=name,avatar_url=message.author.avatar_url)
+                await asyncio.sleep(20.0)
+                await message.delete()
+                await webhook.delete()
+            elif (list(message.content.split(' '))[1]) not in allJsonKeys:
+                await message.channel.send("Sorry,No emoji found with that that name.")
+
         
     
     #############################################################################################

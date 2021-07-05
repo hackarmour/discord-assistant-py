@@ -99,6 +99,7 @@ class Miscellaneous(commands.Cog):
             embed.add_field(name="`>help Tic Tac Toe`",value="To Get Help with Tic Tac Toe Commands")
             embed.add_field(name="`>help Fun`",value="To Get Help with Fun Commands")
             embed.add_field(name="`>help Miscellaneous`", value="To Get Help with Other Commands")
+            embed.add_field(name='`>help lon`',value='To Get Help with Lack Of Nitro aka Emoji Commands.')
 
 
 
@@ -223,6 +224,17 @@ class Miscellaneous(commands.Cog):
 
 :rofl: `>memes <number>`
     Sends <number> amount of memes!!
+"""
+            )
+        elif thing.lower()=='lon':
+            embed.add_field(
+                    name="Lack Of Nitro(L.O.N)",
+                    inline=False,
+                    value="""
+:partying_face: `>lon <emoji name>`
+    To send emoji in chat irrespective of nitro.
+:partying_face: `>lonall`
+    To get list of all the emojis available.
 """
             )
 
