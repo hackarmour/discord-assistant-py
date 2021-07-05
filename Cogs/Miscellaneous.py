@@ -126,7 +126,7 @@ class Miscellaneous(commands.Cog):
     """
         )
 
-        elif thing.lower() == "miscellaneous":
+        elif thing.lower() == "miscellaneous" or "misc":
             embed.add_field(
                 name="MISCELLANEOUS COMMANDS",
                 inline=False,
@@ -150,7 +150,7 @@ class Miscellaneous(commands.Cog):
 """
             )
 
-        elif thing.lower() == "tic tac toe":
+        elif thing.lower() == "tic tac toe" or "ttt":
             embed.add_field(
                 name="TIC TAC TOE",
                 inline=False,
@@ -172,7 +172,7 @@ class Miscellaneous(commands.Cog):
 """
             )
 
-        elif thing.lower() == "moderation":
+        elif thing.lower() == "moderation" or "mod":
             embed.add_field(
                 name="MODERATION",
                 value="""
