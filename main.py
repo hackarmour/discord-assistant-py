@@ -1,22 +1,12 @@
-## ==> IMPORTING NECESSARY MODULES
-#############################################################################################
-
+# Import the necessary modules
 import discord, json, os
 from discord.ext import commands
 from time import time
 
-#############################################################################################
-
-## ==> READING TOKEN
-#############################################################################################
-
+# Read the token
 TOKEN = input("Enter The Token of your bot: ")
 
-#############################################################################################
-
-## ==> CREATING BOT AND IMPORTING COGS
-#############################################################################################
-
+# Initialize the bot instance
 bot = commands.Bot(command_prefix=">", intents=discord.Intents.all(),case_insensitive=True)
 bot.remove_command("help")
 
@@ -47,12 +37,6 @@ async def reload(ctx,cog):
         bot.unload_extension(F"Cogs.{cog}")
         bot.load_extension(F"Cogs.{cog}")
 
-#############################################################################################
-
-## ==> RUNNING THE BOT
-#############################################################################################
-
+# Run the bot
 if __name__ == "__main__":
     bot.run(TOKEN)
-
-#############################################################################################
