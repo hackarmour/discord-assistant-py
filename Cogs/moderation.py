@@ -6,7 +6,7 @@ from discord.ext import commands
 class Logs(commands.Cog):
     def __init__(self,bot):
         self.bot=bot
-        with open("configs/ModConfig.json") as f: self.CONFIG = json.loads(f.read())
+        with open("Configuration/ModConfig.json") as f: self.CONFIG = json.loads(f.read())
         self.illegal_words=['Nigger','Nigga','N1gg3r','N1gger','Nigg3r','N1gga','N1gg@','Dick','Fuck','F U C K','f u c k','gandu','gaandu','gaamdu','fuck','nigger','nigga','n1gg3r','n1gga','n1gg@','dick']
         
     ## ==> THIS FUNCTION BANS CERTAIN WORDS. IF YOU WANT TO BAN SOME MORE WORDS, ADD THEM TO THE LIST ABOVE
@@ -106,7 +106,7 @@ class Logs(commands.Cog):
             self.CONFIG[str(ctx.guild.id)]["ModEnabled"] = True if not self.CONFIG[str(ctx.guild.id)]["ModEnabled"] else False
         else:
             self.CONFIG[str(ctx.guild.id)] = {"ModEnabled":True}
-        with open("configs/ModConfig.json",'w') as f: json.dump(self.CONFIG, f, indent=4)
+        with open("Configuration/ModConfig.json",'w') as f: json.dump(self.CONFIG, f, indent=4)
         enabledordisabled = 'enabled' if self.CONFIG[str(ctx.guild.id)]["ModEnabled"] else 'disabled'
         await ctx.send(embed=discord.Embed(title="MODERATION", description=f"The AutoMod Feature has been {enabledordisabled}!", color = ctx.author.color))
     
@@ -118,7 +118,7 @@ class Logs(commands.Cog):
         else:
             self.CONFIG[str(ctx.guild.id)] = {"channel": None, "toggled": True}
             
-        with open("configs/ModConfig.json",'w') as f: json.dump(self.CONFIG, f, indent=4)
+        with open("Configuration/ModConfig.json",'w') as f: json.dump(self.CONFIG, f, indent=4)
         await ctx.send(embed=discord.Embed(color=ctx.author.color, title="MODERATION", description="Logs Have Been Toggled"))
     
     @commands.command()
@@ -128,7 +128,7 @@ class Logs(commands.Cog):
             if str(ctx.guild.id) not in self.CONFIG.keys(): self.CONFIG[str(ctx.guild.id)] = {"channel": channel.id, "toggled":False}
             else: self.CONFIG[str(ctx.guild.id)]["channel"] = channel.id
             
-            with open("configs/ModConfig.json",'w') as f: json.dump(self.CONFIG, f, indent=4)
+            with open("Configuration/ModConfig.json",'w') as f: json.dump(self.CONFIG, f, indent=4)
             embed = discord.Embed(title="MODERATION",description=f"Logs set to <#{channel.id}> !", color=ctx.author.color)
             await ctx.send(embed=embed)
         else: return

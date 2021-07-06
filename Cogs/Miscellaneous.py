@@ -6,7 +6,7 @@ from time import time
 class Miscellaneous(commands.Cog):
     def __init__(self,bot: commands.Bot) -> None:
         self.bot = bot
-        with open("configs/config.json") as f:
+        with open("Configuration/config.json") as f:
             self.STARTTIME = json.loads(f.read())["starttime"]
 
         self.EIGHT_BALL_ANSWERS = [
