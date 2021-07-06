@@ -27,11 +27,11 @@ for i in os.listdir("Cogs"):
 @bot.event
 async def on_ready():
     print("The Bot is Ready")
-    with open("Configuration/config.json") as f:
+    with open("configs/config.json") as f:
         config = json.loads(f.read())
         config["starttime"] = float(time())
 
-    with open("Configuration/config.json", 'w') as f:
+    with open("configs/config.json", 'w') as f:
         f.write(json.dumps(config))
 
 @bot.command()
