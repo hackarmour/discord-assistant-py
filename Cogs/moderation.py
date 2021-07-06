@@ -9,9 +9,8 @@ class Logs(commands.Cog):
         with open("Configuration/ModConfig.json") as f: self.CONFIG = json.loads(f.read())
         self.illegal_words=['Nigger','Nigga','N1gg3r','N1gger','Nigg3r','N1gga','N1gg@','Dick','Fuck','F U C K','f u c k','gandu','gaandu','gaamdu','fuck','nigger','nigga','n1gg3r','n1gga','n1gg@','dick']
         
-    ## ==> THIS FUNCTION BANS CERTAIN WORDS. IF YOU WANT TO BAN SOME MORE WORDS, ADD THEM TO THE LIST ABOVE
-    #############################################################################################
-    
+    # The following function ban the illegal words given above.
+    # If you want to ban other words, add them to the list above.
     @commands.Cog.listener()
     async def on_message(self,message: discord.Message) -> None:
         if message.author.bot:
@@ -20,9 +19,9 @@ class Logs(commands.Cog):
             if self.CONFIG[str(message.author.guild.id)]["ModEnabled"]:
                 if any(word in message.content for word in self.illegal_words):
                     user=message.author
-                    await message.delete() #This command deletes the messages if it contains those words
-                    await user.send('Your message was deleted due to use of profane and illegal words and you are temporarily muted for 10 minutes.')#This line sends a dm to user
-                    role = discord.utils.get(message.guild.roles,name='Muted') #This command gives the user a muted role, you can change the muted role with any role you want to give but the name is case sensitive
+                    await message.delete() # This command deletes the messages if it contains those words
+                    await user.send('Your message was deleted due to use of profane and illegal words and you are temporarily muted for 10 minutes.') # This line sends a dm to user
+                    role = discord.utils.get(message.guild.roles,name='Muted') # This command gives the user a muted role, you can change the muted role with any role you want to give but the name is case sensitive
                     
                     if role is None:
                         role = await message.author.guild.create_role(name="Muted")
@@ -32,7 +31,7 @@ class Logs(commands.Cog):
         
                     
                     await message.author.add_roles(role)
-                    await asyncio.sleep(600.0) #this is  a timer of 10 mins, after 10 mins the role gets removed automatically.
+                    await asyncio.sleep(600.0) # Timer of 10 minutes to remove mute
                     try: await message.author.remove_roles(role)
                     except Exception: pass
                     
@@ -46,11 +45,8 @@ class Logs(commands.Cog):
             await message.channel.send(embed=discord.Embed(title=f"Hi! I'm {str(self.bot.user)[:-5]}", description="You can use `>help` to get help with my commands",color=message.author.color))
         
     
-    #############################################################################################
-        
-    ## ==>  THIS FUNCTION SENDS LOGS IN A SPECIFIC CHANNEL IF A MESSAGE IS EDITED
-    #############################################################################################
-    
+    # Logs
+    ## Send message in log channel on message edit 
     @commands.Cog.listener()
     async def on_message_edit(self,message_before,message_after):
         if str(message_before.guild.id) in self.CONFIG.keys():
@@ -70,11 +66,7 @@ class Logs(commands.Cog):
                 try: await self.bot.get_channel(self.CONFIG[str(message_before.guild.id)]["channel"]).send(embed=emb)
                 except KeyError: pass
             
-    #############################################################################################
-        
-    ## ==> THIS FUNCTION SENDS LOG WHEN A MESSAGE GETS DELETED
-    #############################################################################################
-    
+    ## Log message on delete
     @commands.Cog.listener()
     async def on_message_delete(self,message):
         if str(message.guild.id) in self.CONFIG.keys():
@@ -94,11 +86,7 @@ class Logs(commands.Cog):
                 try: await self.bot.get_channel(self.CONFIG[str(message.guild.id)]["channel"]).send(embed=emb)
                 except KeyError: pass
         
-    #############################################################################################
-    
-    ## ==> CONFIGURATION
-    #############################################################################################
-    
+    # Update configuration file    
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def togglemod(self, ctx: commands.Context) -> None:
@@ -133,11 +121,7 @@ class Logs(commands.Cog):
             await ctx.send(embed=embed)
         else: return
         
-    #############################################################################################
-
-    ## ==> KICK
-    #############################################################################################
-    
+    # Kick command
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx: commands.Context, user:commands.MemberConverter, *, reason=None) -> None:
@@ -145,12 +129,8 @@ class Logs(commands.Cog):
         else:
             await user.kick(reason=reason)
             await ctx.send(f'{user} has been kicked from your server')
-        
-    #############################################################################################
 
-    ## ==> BAN
-    #############################################################################################
-    
+    # Ban command
     @commands.command()
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx: commands.Context , user: commands.MemberConverter, *, reason=None) -> None:
@@ -163,11 +143,7 @@ class Logs(commands.Cog):
         await user.ban(reason=reason)
         await ctx.send(f'{user} has been banned from your server.')
         
-    #############################################################################################
-    
-    ## ==> UNBAN
-    #############################################################################################
-
+    # Unban
     @commands.command()
     @commands.has_permissions(ban_members=True)
     async def unban(self, ctx: commands.Context,* , member) -> None:
@@ -180,16 +156,16 @@ class Logs(commands.Cog):
                 await ctx.guild.unban(member)
                 await ctx.send(f"Unbanned {member.name}")
         else:
-            member_name,member_disc=member.split('#')#This command will split the member name and its discriminator
+            member_name,member_disc=member.split('#') # Split member name and discriminator
             for banned_entry in banned_users:
                 user = banned_entry.user
-                if (user.name,user.discriminator) == (member_name,member_disc):#This line checks if the given user is in banned users list if yes the next line unban them.
+                # Check if user is banned, then unban
+                if (user.name,user.discriminator) == (member_name,member_disc): 
                     await ctx.guild.unban(user)
                     await ctx.send(f'{user.name} has been unbanned')
                     return
-            await ctx.send(member+'was not found')#and if the given user is not in banned users list it just send this message.
-    
-    #############################################################################################
+            # If user not in the list, send this msg
+            await ctx.send(member+'was not found')
     
     @commands.command()
     @commands.has_guild_permissions(mute_members=True)
@@ -266,16 +242,20 @@ class Logs(commands.Cog):
         else:
             await ctx.send("Member is not muted!")
 
-    @commands.command(aliases=['purge'])#This is a purge commands,the aliases in paranthese means that you can call this command with the folllowing names.
+    # Purge(clear messages) command
+    @commands.command(aliases=['purge'])
     @commands.has_permissions(manage_messages=True)
+    # If no amount of messages is specified, 
+    # 5 messages are deleted by default 
     async def clear(self, ctx: commands.Context, amount=5) -> None:
-        """This command takes only two parameters,that is amount to messages to delete, if no amount is supplied it deletes 5 messages."""
-        await ctx.channel.purge(limit=amount+1)#This line is responsible for deleting messages.
-        msg = await ctx.send(f'Successfully deleted {amount} messages.')#This line sends a message that n number of messages are deleted.
-        await asyncio.sleep(3.0)#Timer of 3 seconds.
-        await msg.delete()#This line will delete the message saying n number of messages are deleted.
-        
-    #############################################################################################
+        """This command purges an amount of messages in a channel."""
+        # Delete the messages
+        await ctx.channel.purge(limit=amount+1)
 
+        # Send a success message, delete it in 3 seconds
+        msg = await ctx.send(f'Successfully deleted {amount} messages.')
+        await asyncio.sleep(3.0)
+        await msg.delete()
+        
 def setup(bot):
     bot.add_cog(Logs(bot))
