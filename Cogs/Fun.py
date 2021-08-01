@@ -1,4 +1,4 @@
-import discord, requests
+import discord, requests, asyncio
 from discord.ext import commands
 from random import choice
 
@@ -297,13 +297,15 @@ class Fun(commands.Cog):
     
     @commands.command()
     async def f(self, ctx: commands.Context, *, reason: str = None) -> None:
-        
-        if reason.__contains__("https://"):
-            await ctx.send("That reason contains a website D:")
-            return
-        elif reason.__contains__("<@"):
-            await ctx.send("There are pings in the reason")
-            return
+        if reason is not None:
+            if reason.__contains__("https://"):
+                await ctx.send("That reason contains a website D:")
+                return
+            elif reason.__contains__("<@"):
+                await ctx.send("There are pings in the reason")
+                return
+            else:
+                await ctx.send(f"{ctx.author.name} has pressed f to pay respect for reason: {reason.replace('@everyone', 'everyone').replace('@here', 'here')}" if reason is not None else f"{ctx.author.name} has pressed f to pay respect")
         else:
             await ctx.send(f"{ctx.author.name} has pressed f to pay respect for reason: {reason.replace('@everyone', 'everyone').replace('@here', 'here')}" if reason is not None else f"{ctx.author.name} has pressed f to pay respect")
     
