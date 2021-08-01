@@ -144,6 +144,16 @@ class Miscellaneous(commands.Cog):
 
     ############################################################################################
     
+    ## ==> INVITE COMMAND
+    ############################################################################################
+    
+    @commands.command()
+    async def invite(self, ctx: commands.Context) -> None:
+        embed = discord.Embed(title='Invite Assistant', description="You can Invite me by clicking this button:", color=ctx.author.color)
+        await ctx.send(embed=embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://www.assistant.hackarmour.tech")]])
+    
+    ############################################################################################
+    
 ## ==> ADDING THE COG TO BOT
 #############################################################################################
 
