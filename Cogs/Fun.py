@@ -1,6 +1,7 @@
 import discord, requests
 from discord.ext import commands
 from random import choice
+import asyncio
 
 
 class Fun(commands.Cog):
