@@ -2,6 +2,7 @@ import discord, sys, datetime, json
 from discord.ext import commands
 from time import time
 from dpymenus import PaginatedMenu, Page
+from discord_components import Button, ButtonStyle
 
 class Miscellaneous(commands.Cog):
     def __init__(self,bot: commands.Bot) -> None:
@@ -67,7 +68,6 @@ class Miscellaneous(commands.Cog):
     ##############################################################################################
 
     @commands.command()
-    @commands.cooldown(1,60,commands.cooldowns.BucketType.user)
     async def help(self, ctx: commands.Context) -> None:
         
         pages = []
@@ -137,9 +137,10 @@ class Miscellaneous(commands.Cog):
 
     @commands.command()
     async def donate(self,ctx: commands.Context) -> None:
-        emb_=discord.Embed(title="Support Us",color=ctx.author.color, url=f"https://patreon.com/hackarmour")
-        emb_.add_field(name='Please support the development by becoming a patron!',value="[Click here](https://patreon.com/hackarmour) to go our Patreon page.")
-        await ctx.send(embed=emb_)
+        btn = Button(label="Patreon - Hack Armour", style=ButtonStyle.URL, url = "https://www.patreon.com/hackarmour", id = "embed")
+        embed = discord.Embed(title="Support Us",color=ctx.author.color)
+        embed.add_field(name='Please support the development by becoming a patron!',value="Click the Button below to go our Patreon page.")
+        await ctx.send(components=[[btn]], embed=embed)
 
     ############################################################################################
     
