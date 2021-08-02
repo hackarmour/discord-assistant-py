@@ -97,15 +97,15 @@ class Miscellaneous(commands.Cog):
     @commands.command()
     async def stats(self,ctx: commands.Context) -> None:
         pyver = str(sys.version[:6])
-        embed_ = discord.Embed(title="STATS",color=ctx.author.color,inline=False)
-        embed_.add_field(inline=False,name="Uptime",value=str(datetime.timedelta(seconds=int(round(time() - self.STARTTIME)))))
-        embed_.add_field(inline=False,name="Ping",value=f"{round(self.bot.latency * 1000)}ms")
-        embed_.add_field(inline=False,name="Discord.py version",value=discord.__version__)
-        embed_.add_field(inline=False,name="Python Version",value=pyver)
-        embed_.add_field(inline=False,name="Server",value=ctx.guild)
-        embed_.add_field(inline=False,name='Total Servers',value=f'Playing in {str(len(self.bot.guilds))} servers')
-        embed_.set_thumbnail(url=ctx.guild.icon_url)
-        await ctx.send(embed = embed_)
+        embed = discord.Embed(title="STATS",color=ctx.author.color,inline=False)
+        embed.add_field(inline=True,name="UPTIME",value=f"```\n{str(datetime.timedelta(seconds=int(round(time() - self.STARTTIME))))}\n```")
+        embed.add_field(inline=True,name="PING",value=f"```\n{round(self.bot.latency * 1000)}ms\n```")
+        embed.add_field(inline=True,name="DISCORD.PY VERSION",value=f"```\n{discord.__version__}\n```")
+        embed.add_field(inline=True,name="PYTHON VERSION",value=f"```\n{pyver}\n```")
+        embed.add_field(inline=True,name="SERVER",value=f"```\n{ctx.guild}\n```")
+        embed.add_field(inline=True,name='TOTAL SERVERS',value=f'```\n{str(len(self.bot.guilds))}\n```')
+        embed.set_thumbnail(url=ctx.guild.icon_url)
+        await ctx.send(embed = embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://assistant.hackarmour.tech")]])
 
     #############################################################################################
 
@@ -142,16 +142,6 @@ class Miscellaneous(commands.Cog):
         embed.add_field(name='Please support the development by becoming a patron!',value="Click the Button below to go our Patreon page.")
         await ctx.send(components=[[btn]], embed=embed)
 
-    ############################################################################################
-    
-    ## ==> INVITE COMMAND
-    ############################################################################################
-    
-    @commands.command()
-    async def invite(self, ctx: commands.Context) -> None:
-        embed = discord.Embed(title='Invite Assistant', description="You can Invite me by clicking this button:", color=ctx.author.color)
-        await ctx.send(embed=embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://www.assistant.hackarmour.tech")]])
-    
     ############################################################################################
     
 ## ==> ADDING THE COG TO BOT

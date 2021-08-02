@@ -1,5 +1,4 @@
 import discord, requests, asyncio
-from discord_components.interaction import Interaction
 from discord.ext import commands
 from random import choice
 from discord_components import Button, ButtonStyle, InteractionType
