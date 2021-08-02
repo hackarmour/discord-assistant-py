@@ -105,7 +105,7 @@ class Miscellaneous(commands.Cog):
         embed.add_field(inline=True,name="SERVER",value=f"```\n{ctx.guild}\n```")
         embed.add_field(inline=True,name='TOTAL SERVERS',value=f'```\n{str(len(self.bot.guilds))}\n```')
         embed.set_thumbnail(url=ctx.guild.icon_url)
-        await ctx.send(embed = embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://assistant.hackarmour.tech")]])
+        await ctx.send(embed = embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://discord.com/api/oauth2/authorize?client_id=845154524997877770&permissions=8&scope=bot")]])
 
     #############################################################################################
 
