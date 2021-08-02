@@ -1,7 +1,7 @@
-import discord, requests
+import discord, requests, asyncio
 from discord.ext import commands
 from random import choice
-import asyncio
+from discord_components import Button, ButtonStyle, InteractionType
 
 
 class Fun(commands.Cog):
@@ -40,30 +40,42 @@ class Fun(commands.Cog):
         ##############################################################################################
         
         ## ==> ASK FOR A GAME
-        ##############################################################################################
+        #############################################################################################
         
-        message = await ctx.send(embed=discord.Embed(title="TIC TAC TOE *REVAMP*", description=f"{p2.mention}, {ctx.author.mention} invites you to a game of Tic Tac Toe!\nReact with ✋ to accept the invite!"))
-        await message.add_reaction("✋")
+        ## ==> BUTTONS
+        accept = Button(label="Accept", style=ButtonStyle.green)
+        decline = Button(label="Decline", style=ButtonStyle.red)
+        
+        ## ==> SEND THE MESSAGES
+        embed = discord.Embed(title="TIC TAC TOE", description=f"{p2.mention}, {ctx.author.mention} invites you to a game of Tic Tac Toe!")
+        message = await ctx.send(
+            embed=embed,
+            components=[[accept, decline]]
+        )
+        
+        ## ==> CHECK IF USER RESPONDED
         try:
-            await self.bot.wait_for("reaction_add", timeout=25.0, check=lambda reaction, user: user == p2 and str(reaction.emoji) == "✋")
+            res = await self.bot.wait_for("button_click", timeout=25.0, check=lambda res: res.user == p2)
         except asyncio.TimeoutError:
-            await ctx.send("Request Timed Out")
+            await message.edit(embed=discord.Embed(title="TIC TAC TOE", description=f"Oh no! {p2.name} didn't click any button on time.", color=discord.Color.red()), components=[])
             return
-            
+        
+        if res.component.label == "Accept":
+            await res.respond(type = InteractionType.UpdateMessage, embed=discord.Embed(title=f"Game between {ctx.author.name} and {p2.name}", description="Please wait for the bot to respond with all emojis", color=discord.Color.green()), components = [])
+            await asyncio.sleep(2.0)
+        elif res.component.label == "Decline":
+            await res.respond(type = InteractionType.UpdateMessage, embed=discord.Embed(title=f"Game between {ctx.author.name} and {p2.name}", description="Match Declined",color=discord.Color.red()), components = [])
+            return
+        
         ##############################################################################################
-            
-        await message.edit(embed=discord.Embed(title="THE GAME HAS BEGUN!", description="Please Wait for the bot to react with all emojis before entering your choice"))
-        await message.clear_reactions()
-        await asyncio.sleep(2.0)
-        await message.clear_reactions()
         
         ## ==> EDIT THE EMBED TO SET THE GRID
         ##############################################################################################
         
         embed = discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", description="".join(self._board_template), color=ctx.author.color)
         embed.set_footer(text=f"{ctx.author.name}'s Turn")
-        await message.edit(embed=embed)
-        
+        await message.edit(embed = embed)
+                
         ##############################################################################################
         
         ## ==> VARIABLES
@@ -279,7 +291,7 @@ class Fun(commands.Cog):
             
             ##############################################################################################
         
-        await ctx.send(f"Final Board:\n{''.join(_current_board)}")    
+        await ctx.send(embed = discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", description=f"Final Board:\n{''.join(_current_board)}", color=ctx.author.color))
         
         ##############################################################################################
     
@@ -298,13 +310,15 @@ class Fun(commands.Cog):
     
     @commands.command()
     async def f(self, ctx: commands.Context, *, reason: str = None) -> None:
-        
-        if reason.__contains__("https://"):
-            await ctx.send("That reason contains a website D:")
-            return
-        elif reason.__contains__("<@"):
-            await ctx.send("There are pings in the reason")
-            return
+        if reason is not None:
+            if reason.__contains__("https://"):
+                await ctx.send("That reason contains a website D:")
+                return
+            elif reason.__contains__("<@"):
+                await ctx.send("There are pings in the reason")
+                return
+            else:
+                await ctx.send(f"{ctx.author.name} has pressed f to pay respect for reason: {reason.replace('@everyone', 'everyone').replace('@here', 'here')}" if reason is not None else f"{ctx.author.name} has pressed f to pay respect")
         else:
             await ctx.send(f"{ctx.author.name} has pressed f to pay respect for reason: {reason.replace('@everyone', 'everyone').replace('@here', 'here')}" if reason is not None else f"{ctx.author.name} has pressed f to pay respect")
     

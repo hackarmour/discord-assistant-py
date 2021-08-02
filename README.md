@@ -19,6 +19,7 @@ ___
 ## Requirements
 - discord.py == 1.7.3
 - dpymenus == 2.1.5
+- discord-components == 1.1.4
 - requests == 2.25.1
 - youtube_dl == 2021.6.6
 - disrank == 0.0.2

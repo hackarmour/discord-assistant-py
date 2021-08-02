@@ -2,6 +2,7 @@
 import discord, json, os
 from discord.ext import commands
 from time import time
+from discord_components import DiscordComponents
 
 # Read the token
 TOKEN = input("Enter The Token of your bot: ")
@@ -16,6 +17,7 @@ for i in os.listdir("Cogs"):
 
 @bot.event
 async def on_ready():
+    DiscordComponents(bot)
     print("The Bot is Ready")
     with open("Configuration/config.json") as f:
         config = json.loads(f.read())
