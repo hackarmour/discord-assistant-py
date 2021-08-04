@@ -5,7 +5,7 @@ import discord, os, json
 import pandas as pd
 import numpy as np
 from discord.ext import commands
-from random import randint
+from random import randint, choice
 from disrank.generator import Generator
 
 #############################################################################################
@@ -46,6 +46,9 @@ class LevelingPD(commands.Cog):
         if str(message.guild.id) in self.CONFIG.keys():
             if self.CONFIG[str(message.guild.id)]:
                 return
+                
+        if not choice([True, True, True, False, False, False, False, False, False, False]):
+            return
         
                 
         ## ==> CHOOSE A RANDOM VALUE FOR XP        
