@@ -387,12 +387,8 @@ Get the patreon link of HackArmour
         embed.add_field(inline=True,name="SERVER",value=f"```\n{ctx.guild}\n```")
         embed.add_field(inline=True,name='TOTAL SERVERS',value=f'```\n{str(len(self.bot.guilds))}\n```')
         embed.set_thumbnail(url=ctx.guild.icon_url)
-<<<<<<< HEAD
         embed.set_image(url="https://cdn.discordapp.com/attachments/616315208251605005/616319462349602816/Tw.gif")
         await ctx.send(embed = embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://assistant.hackarmour.tech", emoji = '🔗')]])
-=======
-        await ctx.send(embed = embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://discord.com/api/oauth2/authorize?client_id=845154524997877770&permissions=8&scope=bot")]])
->>>>>>> f58be3d1c5c7758052424365742d09aa31f26f44
 
     #############################################################################################
 
