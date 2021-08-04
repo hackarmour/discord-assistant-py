@@ -111,7 +111,7 @@ class Welcomer(commands.Cog):
     
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def setWelcomeChannel(self,ctx: commands.Context,channel: discord.TextChannel) -> None:
+    async def setWelcomerChannel(self,ctx: commands.Context,channel: discord.TextChannel) -> None:
         if channel in ctx.guild.channels:
             if str(ctx.guild.id) not in self.CONFIG.keys():
                 self.CONFIG[str(ctx.guild.id)] = {

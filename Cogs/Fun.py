@@ -23,7 +23,214 @@ class Fun(commands.Cog):
         self.data = {}
     
     
+    ## ==> ROCK PAPER SCISSORS
+    #############################################################################################
+    
     @commands.command()
+    @commands.guild_only()
+    async def rps(self, ctx: commands.Context, p2: commands.MemberConverter) -> None:
+        
+        ## ==> CHECKS
+        #############################################################################################
+        
+        if ctx.author.bot: return
+        if p2.bot: 
+            await ctx.send("You can't play against a bot!")
+            return
+        if ctx.author.id == p2.id:
+            await ctx.send("You can't invite yourself!")
+            return
+        
+        #############################################################################################
+        
+        ## ==> CREATING BUTTONS
+        #############################################################################################
+        
+        p1Buttons = [
+            Button(label="Rock", style=ButtonStyle.blue, id="p1r", emoji = '🪨'),
+            Button(label="Paper", style=ButtonStyle.blue, id="p1p", emoji = '📄'),
+            Button(label="Scissors", style=ButtonStyle.blue, id="p1s", emoji = '✂')
+        ]
+        
+        p2Buttons = [
+            Button(label="Rock", style=ButtonStyle.red, id="p2r", emoji = '🪨'),
+            Button(label="Paper", style=ButtonStyle.red, id="p2p", emoji = '📄'),
+            Button(label="Scissors", style=ButtonStyle.red, id="p2s", emoji = '✂')
+        ]
+        
+        buttons = [p1Buttons, p2Buttons]
+        
+        #############################################################################################
+        
+        ## ==> CREATE EMBED
+        embed = discord.Embed(
+                title="ROCK PAPER SCISSORS",
+                description=f"{ctx.author.mention} - Blue\n{p2.mention} - Red",
+                color=ctx.author.color
+        )
+        
+        ## ==> SEND MESSAGE
+        message = await ctx.send(
+            embed=embed,
+            components=buttons
+        )
+        
+        ## ==> DECLARE VARIABLES
+        p1choice, p2choice = None, None
+        
+        ## ==> MAIN LOOP
+        #############################################################################################
+        
+        while True:
+            ## ==> GET REACTION
+            #########################################################################################
+            
+            try:
+                reaction = await self.bot.wait_for(
+                    "button_click",
+                    timeout=25.0,
+                    check=lambda res: res.user == ctx.author or res.user == p2
+                )
+            except asyncio.TimeoutError:
+                await message.edit(
+                    "Either of you guys didn't click on time, so I ended the game",
+                    components=[[]]
+                )
+                return
+                
+            #############################################################################################      
+            
+            ## ==> CHECK IF REACTION WAS FROM P1
+            #############################################################################################
+            
+            if reaction.component.id in ['p1r', 'p1p','p1s'] and reaction.user == ctx.author:
+                
+                ## ==> DISABLE ALL THE BUTTONS FOR P1
+                for i in p1Buttons: i._disabled = True
+                
+                ## ==> TO CHECK IF THIS IS THE LAST REACTION
+                if i == 1: 
+                    desc = "*Processing...*"
+                else: 
+                    desc = f"{ctx.author.mention} has got a choice!\n{p2.mention}, choose your quick!"
+                ## ==> RESPOND TO REACTION
+                await reaction.respond(
+                    type=InteractionType.UpdateMessage,
+                    embed=discord.Embed(
+                        title="ROCK PAPER SCISSORS",
+                        description=desc,
+                        color=ctx.author.color
+                    ),
+                    components=[p1Buttons, p2Buttons]
+                )
+                p1choice = reaction.component.label
+            
+            #############################################################################################
+            
+            ## ==> TO CHECK IF REACTION WAS FROM P2
+            #############################################################################################
+            
+            elif reaction.component.id in ['p2r', 'p2p', 'p2s'] and reaction.user == p2:
+                
+                ## ==> DISABLE ALL THE BUTTONS FOR P2
+                for i in p2Buttons: i._disabled = True
+                
+                ## ==> TO CHECK IF THIS IS THE LAST REACTION
+                if i == 1: 
+                    desc = "*Processing...*"
+                else:
+                    desc = f"{p2.mention} has got a choice!\n{ctx.author.mention}, choose your quick!"
+                    
+                ## ==> RESPOND TO REACTION
+                await reaction.respond(
+                    type=InteractionType.UpdateMessage,
+                    embed=discord.Embed(
+                        title="ROCK PAPER SCISSORS",
+                        description=desc,
+                        color=p2.color
+                    ),
+                    components=[p1Buttons, p2Buttons]
+                )
+                p2choice = reaction.component.label
+        
+            #############################################################################################
+        
+            ## ==> CHECK IF BOTH PlAYERS HAVE RESPONDED
+            if p1choice is not None and p2choice is not None: break
+            
+        #############################################################################################
+        
+        await asyncio.sleep(2.0)
+        
+        ## ==> CHECK FOR WINNER
+        #############################################################################################
+        
+        ## ==> P1
+        #############################################################################################
+        if (p1choice.lower(), p2choice.lower()) in [
+            ("paper", "rock"),
+            ("rock", "scissors"),
+            ("scissors", "paper")
+        ]:
+            await message.edit(
+                embed=discord.Embed(
+                    title="ROCK PAPER SCISSOR",
+                    description=f"""
+{ctx.author.mention} chose {p1choice}
+{p2.mention} chose {p2choice}
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+**{ctx.author.mention} has won!**
+""",
+                    color=ctx.author.color
+                ),
+                components=[]
+            )
+        
+        #############################################################################################
+        
+        ## ==> P2
+        #############################################################################################
+        
+        elif (p2choice.lower(), p1choice.lower()) in [("paper", "rock"), ("rock", "scissors"), ("scissors", "paper")]:
+            await message.edit(
+                embed=discord.Embed(
+                    title="ROCK PAPER SCISSOR",
+                    description=f"""
+{ctx.author.mention} chose {p1choice}
+{p2.mention} chose {p2choice}
+\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+**{p2.mention} has won!**
+""",
+                    color=p2.color
+                ),
+                components=[]
+            )
+            
+        #############################################################################################
+        
+        ## ==> DRAWED GAME
+        else:
+            await message.edit(
+                embed=discord.Embed(
+                    title="ROCK PAPER SCISSOR",
+                    description="Both of you chose the same Button, so the game is drawed",
+                    color=discord.Color.blurple
+                ),
+                components=[]
+            )
+        
+        #############################################################################################
+
+    
+    #############################################################################################
+        
+    ## ==> TIC TAC TOE
+    #############################################################################################
+    
+    @commands.command()
+    @commands.guild_only()
     async def ttt(self, ctx: commands.Context, p2: commands.MemberConverter) -> None:
         
         ## ==> CHECKS
@@ -47,7 +254,11 @@ class Fun(commands.Cog):
         decline = Button(label="Decline", style=ButtonStyle.red)
         
         ## ==> SEND THE MESSAGES
-        embed = discord.Embed(title="TIC TAC TOE", description=f"{p2.mention}, {ctx.author.mention} invites you to a game of Tic Tac Toe!")
+        embed = discord.Embed(
+            title="TIC TAC TOE",
+            description=f"{p2.mention},{ctx.author.mention} invites you to a game of Tic Tac Toe!",
+            color=ctx.author.color
+        )
         message = await ctx.send(
             embed=embed,
             components=[[accept, decline]]
@@ -57,7 +268,14 @@ class Fun(commands.Cog):
         try:
             res = await self.bot.wait_for("button_click", timeout=25.0, check=lambda res: res.user == p2)
         except asyncio.TimeoutError:
-            await message.edit(embed=discord.Embed(title="TIC TAC TOE", description=f"Oh no! {p2.name} didn't click any button on time.", color=discord.Color.red()), components=[])
+            await message.edit(
+                embed=discord.Embed(
+                    title="TIC TAC TOE",
+                    description=f"Oh no! {p2.name} didn't click any button on time",
+                    color=discord.Color.red()
+                    ),
+                components=[]
+            )
             return
         
         if res.component.label == "Accept":
@@ -72,7 +290,11 @@ class Fun(commands.Cog):
         ## ==> EDIT THE EMBED TO SET THE GRID
         ##############################################################################################
         
-        embed = discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", description="".join(self._board_template), color=ctx.author.color)
+        embed = discord.Embed(
+            title=f"Game Between {ctx.author.name} and {p2.name}", 
+            description="".join(self._board_template), 
+            color=ctx.author.color
+        )
         embed.set_footer(text=f"{ctx.author.name}'s Turn")
         await message.edit(embed = embed)
                 
@@ -141,7 +363,13 @@ class Fun(commands.Cog):
             
             try: await self.bot.wait_for("reaction_add", timeout=25.0, check=check)
             except asyncio.TimeoutError:
-                await message.edit(embed=discord.Embed(color=discord.Color.green(), title=f"Game Between {ctx.author.name} and {p2.name}", description=f"{ctx.author.name if _turn == p2 else p2.name} has won the game since {p2.name if _turn == p2 else ctx.author.name} didn't respond in time!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        color=discord.Color.green(),
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        description=f"{ctx.author.name if _turn == p2 else p2.name} has won the game since {p2.name if _turn == p2 else ctx.author.name} didn't respond in time!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
                 
@@ -189,42 +417,90 @@ class Fun(commands.Cog):
             
             if (_current_board[0], _current_board[1], _current_board[2]) == (":x:", ":x:", ":x:\n") or (_current_board[0], _current_board[1], _current_board[2]) == (":o:", ":o:", ":o:\n"): 
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description=f"{_turn} has won the Game!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=ctx.author.color,
+                        description=f"{_turn} has won the Game!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             elif (_current_board[3], _current_board[4], _current_board[5]) == (":x:", ":x:", ":x:\n") or (_current_board[3], _current_board[4], _current_board[5]) == (":o:", ":o:", ":o:\n"): 
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description=f"{_turn} has won the Game!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=ctx.author.color,
+                        description=f"{_turn} has won the Game!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             elif (_current_board[6], _current_board[7], _current_board[8]) == (":x:", ":x:", ":x:") or (_current_board[6], _current_board[7], _current_board[8]) == (":o:", ":o:", ":o:"): 
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description=f"{_turn} has won the Game!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=ctx.author.color,
+                        description=f"{_turn} has won the Game!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             elif (_current_board[0], _current_board[3], _current_board[6]) == (":x:", ":x:", ":x:") or (_current_board[0], _current_board[3], _current_board[6]) == (":o:", ":o:", ":o:"): 
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description=f"{_turn} has won the Game!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=ctx.author.color,
+                        description=f"{_turn} has won the Game!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             elif (_current_board[1], _current_board[4], _current_board[7]) == (":x:", ":x:", ":x:") or (_current_board[1], _current_board[4], _current_board[7]) == (":o:", ":o:", ":o:"): 
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description=f"{_turn} has won the Game!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=ctx.author.color,
+                        description=f"{_turn} has won the Game!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             elif (_current_board[2], _current_board[5], _current_board[8]) == (":x:\n", ":x:\n", ":x:") or (_current_board[2], _current_board[5], _current_board[8]) == (":o:\n", ":o:\n", ":o:"): 
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description=f"{_turn} has won the Game!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=ctx.author.color,
+                        description=f"{_turn} has won the Game!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             elif (_current_board[0], _current_board[4], _current_board[8]) == (":x:", ":x:", ":x:") or (_current_board[0], _current_board[4], _current_board[8]) == (":o:", ":o:", ":o:"): 
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description=f"{_turn} has won the Game!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=ctx.author.color,
+                        description=f"{_turn} has won the Game!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             elif (_current_board[2], _current_board[4], _current_board[6]) == (":x:\n", ":x:", ":x:") or (_current_board[2], _current_board[4], _current_board[6]) == (":o:\n", ":o:", ":o:"): 
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description=f"{_turn} has won the Game!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=ctx.author.color,
+                        description=f"{_turn} has won the Game!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             
@@ -267,7 +543,11 @@ class Fun(commands.Cog):
             ## ==> UPDATE THE EMBED
             ##############################################################################################
             
-            embed = discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=ctx.author.color, description="".join(_current_board))
+            embed = discord.Embed(
+                title=f"Game Between {ctx.author.name} and {p2.name}",
+                color=ctx.author.color,
+                description="".join(_current_board)
+            )
             embed.set_footer(text=f"{_turn.name}'s Turn")
             await message.edit(embed=embed)
             await message.clear_reactions()
@@ -283,7 +563,13 @@ class Fun(commands.Cog):
             
             if self.data[f"{ctx.author.id} & {p2.id}"]["TURN_NO"] == 9:
                 await message.clear_reactions()
-                await message.edit(embed=discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", color=discord.Color.green(), description="Game Draw!"))
+                await message.edit(
+                    embed=discord.Embed(
+                        title=f"Game Between {ctx.author.name} and {p2.name}",
+                        color=discord.Color.green(),
+                        description="Game Draw!"
+                    )
+                )
                 del self.data[f"{ctx.author.id} & {p2.id}"]
                 break
             
@@ -291,17 +577,30 @@ class Fun(commands.Cog):
             
             ##############################################################################################
         
-        await ctx.send(embed = discord.Embed(title=f"Game Between {ctx.author.name} and {p2.name}", description=f"Final Board:\n{''.join(_current_board)}", color=ctx.author.color))
+        await ctx.send(
+            embed = discord.Embed(
+                title=f"Game Between {ctx.author.name} and {p2.name}",
+                description=f"Final Board:\n{''.join(_current_board)}",
+                color=ctx.author.color
+            )            
+        )
         
         ##############################################################################################
     
+    #############################################################################################
     
     ## ==> COIN FLIP
     #############################################################################################
     
     @commands.command()
     async def coin(self, ctx: commands.Context) -> None:
-        await ctx.send(embed=discord.Embed(title="COIN FLIP", description=f"Coin has been Tossed: {choice(['Heads', 'Tails'])}", color=discord.Color.green()))
+        await ctx.send(
+            embed=discord.Embed(
+                title="COIN FLIP",
+                description=f"Coin has been Tossed: {choice(['Heads', 'Tails'])}",
+                color=discord.Color.green()
+            )
+        )
 
     #############################################################################################
     
@@ -311,16 +610,18 @@ class Fun(commands.Cog):
     @commands.command()
     async def f(self, ctx: commands.Context, *, reason: str = None) -> None:
         if reason is not None:
-            if reason.__contains__("https://"):
+            if any(k in reason for k in ["https://", "http://", "discord.com", "discord.gg"]):
                 await ctx.send("That reason contains a website D:")
                 return
             elif reason.__contains__("<@"):
                 await ctx.send("There are pings in the reason")
                 return
             else:
-                await ctx.send(f"{ctx.author.name} has pressed f to pay respect for reason: {reason.replace('@everyone', 'everyone').replace('@here', 'here')}" if reason is not None else f"{ctx.author.name} has pressed f to pay respect")
+                await ctx.send(
+                    f"{ctx.author.name} has pressed f to pay respect for reason: {reason.replace('@everyone', 'everyone').replace('@here', 'here')}"
+                )
         else:
-            await ctx.send(f"{ctx.author.name} has pressed f to pay respect for reason: {reason.replace('@everyone', 'everyone').replace('@here', 'here')}" if reason is not None else f"{ctx.author.name} has pressed f to pay respect")
+            await ctx.send(f"{ctx.author.name} has pressed f to pay respect")
     
     #############################################################################################
     
@@ -329,8 +630,12 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=['8ball'])
     async def eightBall(self, ctx: commands.Context, *, question) -> None:
-        embed = discord.Embed(color=ctx.author.color, title="8BALL", description=f"Question - {question}?\nAnswer - {choice(self.EIGHT_BALL_ANSWERS)}")
-        embed.set_author(name=str(ctx.author)[:-5], icon_url=ctx.author.avatar_url)
+        embed = discord.Embed(
+            color=ctx.author.color,
+            title="8BALL",
+            description=f"Question - {question}?\nAnswer - {choice(self.EIGHT_BALL_ANSWERS)}"
+        )
+        embed.set_author(name=str(ctx.author.name), icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
     #############################################################################################
@@ -340,23 +645,17 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def meme(self,ctx: commands.Context) -> None:
-        r = requests.get("https://memes.blademaker.tv/api?lang=en")
-        res = r.json()
-        embed_ = discord.Embed(title=res['title'],color=discord.Color.blue())
-        embed_.set_image(url = res["image"])
-        embed_.set_author(name = ctx.author,icon_url = ctx.author.avatar_url)
-        await ctx.send(embed = embed_)
-
-    @commands.command()
-    async def memes(self, ctx: commands.Context, number: int = 3) -> None:
-        if number <= 3:
-            for i in range(number):
-                r = requests.get("https://memes.blademaker.tv/api?lang=en")
-                res = r.json()
-                embed_ = discord.Embed(title=res['title'], color=discord.Color.blue())
-                embed_.set_image(url = res["image"])
-                embed_.set_author(name = ctx.author,icon_url = ctx.author.avatar_url)
-                await ctx.send(embed = embed_)
+        while True:
+            r = requests.get("https://memes.blademaker.tv/api?lang=en")
+            res = r.json()
+            if res["nsfw"]:
+                continue
+            embed_ = discord.Embed(title=res['title'],color=discord.Color.blue())
+            embed_.set_image(url = res["image"])
+            embed_.set_author(name = ctx.author,icon_url = ctx.author.avatar_url)
+            embed_.set_footer(text=f"👍 {res['ups']} **|** 👎 {res['downs']}")
+            await ctx.send(embed = embed_)
+            break
 
     #############################################################################################
 

@@ -1,8 +1,7 @@
-import discord, sys, datetime, json
+import discord, sys, datetime, json, asyncio
 from discord.ext import commands
 from time import time
-from dpymenus import PaginatedMenu, Page
-from discord_components import Button, ButtonStyle
+from discord_components import Button, ButtonStyle, Select, SelectOption, InteractionType
 
 class Miscellaneous(commands.Cog):
     def __init__(self,bot: commands.Bot) -> None:
@@ -18,12 +17,13 @@ class Miscellaneous(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error) -> None:
+        print(type(error))
         if isinstance(error, commands.CommandNotFound):
             pass
         elif isinstance(error, commands.MissingRequiredArgument):
-            if str(ctx.command) == "ban" or str(ctx.command) == "kick":
+            if (str(ctx.command) == "ban" or str(ctx.command) == "kick") and isinstance(error, commands.MissingRequiredArgument):
                 await ctx.send(embed=discord.Embed(title="Whoops", description=f"Tell me the user you want to {str(ctx.command)} too!", color=discord.Color.red()))
-            elif str(ctx.command) == "unban":
+            elif str(ctx.command) == "unban" and isinstance(error, commands.MemberNotFound):
                 await ctx.send(embed=discord.Embed(title="Whoops", description=f"Pass Either the ID of the user or `name#discriminator` for me to identify them", color=discord.Color.red()))
             elif str(ctx.command) == "SetWelcomeMessage":
                 await ctx.send(embed=discord.Embed(title="Whoops", description=f"Enter the Message for me to welcome users with!", color=discord.Color.red()))
@@ -38,14 +38,16 @@ class Miscellaneous(commands.Cog):
             else:
                 await ctx.send(embed=discord.Embed(title="Whoops", description="Please pass all the arguements for that command", color = discord.Color.red()))
             
-        elif str(ctx.command) == "setWelcomeChannel" and isinstance(error, commands.ChannelNotFound):
+        elif str(ctx.command) == "setWelcomerChannel" and isinstance(error, commands.ChannelNotFound):
             await ctx.send(embed=discord.Embed(title="Whoops", description=f"That channel doesn't Exist!", color=discord.Color.red()))
-        elif str(ctx.command) == "setWelcomeChannel" and isinstance(error, commands.ChannelNotReadable):
+        elif str(ctx.command) == "setWelcomerChannel" and isinstance(error, commands.ChannelNotReadable):
             await ctx.send(embed=discord.Embed(title="Whoops", description=f"I cannot read that channel!", color=discord.Color.red()))
+        elif isinstance(error, commands.ChannelNotReadable): 
+            pass
         elif isinstance(error, commands.CommandOnCooldown):
             await ctx.send(embed=discord.Embed(title="Whoops", description=f"{str(ctx.command).capitalize()} Command is on Cooldown!", color=discord.Color.red()))
         elif isinstance(error, commands.MissingPermissions):
-            await ctx.send(embed=discord.Embed(title="Whoops", description="It looks like I don't have perms to Process that", color=discord.Color.red()))
+            await ctx.send(embed=discord.Embed(title="Whoops", description="You are missing Permissions to do that!", color=discord.Color.red()))
         else:
             await ctx.send(embed=discord.Embed(title="Whoops", description=f"An Unexpected Error has popped out of nowhere: {error}", color = discord.Color.red()))
 
@@ -66,28 +68,308 @@ class Miscellaneous(commands.Cog):
 
     ## ==> HELP COMMAND
     ##############################################################################################
-
+    
     @commands.command()
     async def help(self, ctx: commands.Context) -> None:
         
-        pages = []
-        menu = PaginatedMenu(ctx)
+        ## ==> SELECT WIDGET
+        #########################################################################################
         
-        for i in self.CONFIG:
-            description = ""
-            for j in self.CONFIG[i]:
-                description += "\n{}".format(j + '\n' +  self.CONFIG[i][j])
-            
-            pages.append(
-                Page(
-                    title = i,
-                    description = description,
-                    color = ctx.author.color
-                )
+        select = Select(
+            placeholder="Choose what you want help with!",
+            options = [
+                SelectOption(
+                    label="Moderation",
+                    value="Moderation",
+                    description="Get help with Moderation",
+                    emoji="🧐"
+                ),
+                SelectOption(
+                    label="Fun",
+                    value="Fun",
+                    description="Get help with Fun",
+                    emoji="😄"
+                ),
+                SelectOption(
+                    label="Leveling",
+                    value="Leveling",
+                    description="Get help with Leveling",
+                    emoji="📈"
+                ),
+                SelectOption(
+                    label="Music",
+                    value="Music",
+                    description="Get help with Music",
+                    emoji="🎶"
+                ),
+                SelectOption(
+                    label="LON",
+                    value="LON",
+                    description="Get help with LON",
+                    emoji="😃"
+                ),
+                SelectOption(
+                    label="Configuration",
+                    value="Configuration",
+                    description="Get help with Configuration",
+                    emoji="⚙"
+                ),
+                SelectOption(
+                    label="Miscellaneous",
+                    value="Miscellaneous",
+                    description="Get help with Other Commands",
+                    emoji="⚪"
+                ),
+            ]
+        )
+        
+        #########################################################################################
+        
+        ## ==> EMBEDS DICTIONARY
+        #########################################################################################
+        
+        embeds = {
+            "Moderation": discord.Embed(
+                title="MODERATION",
+                color=ctx.author.color,
+                description="""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+    
+• :x: `ban [member] (reason)`
+```
+To Ban a member
+```
+
+• :rage: `kick [member] (reason)`
+```
+To Kick a member
+```
+
+• :white_check_mark: `unban [[username#discriminator] OR [UserID]]`
+```
+To Unban a member
+```
+
+• :mute: `mute [member] [time] (reason)`
+```
+To Mute a member 
+
+time:
+s, m, h, d, w
+```
+
+• :loud_sound: `unmute [member]`
+```
+To Unmute a member
+```
+
+• :x: `purge (number)`
+```
+To clear number amount of messages
+
+default is 5
+```
+"""
+            ),
+            "Fun": discord.Embed(
+                title="FUN",
+                color=ctx.author.color,
+                description="""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+
+• :rock: `rps [member]`
+```
+To play Rock-Paper-Scissors with a member
+```
+
+• :o:`ttt [member]`
+```
+To play Tic-Tac-Toe with a member
+```
+
+• :question: `8ball [question]`
+```
+Get a random answer of your question
+```
+
+• :coin: `coin`
+```
+Tosses an imaginary coin
+```
+
+• :regional_indicator_f: `f (reason)`
+```
+press F to pay respect
+```
+
+• :joy: `meme`
+```
+I will meme for you
+```
+"""
+            ),
+            "Leveling": discord.Embed(
+                title="LEVELING",
+                color=ctx.author.color,
+                description="""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+
+• :chart_with_upwards_trend: `rank (member)`
+```
+To get the rank card of a member
+
+Defaults to the member who ran the command
+```
+
+• :chart_with_upwards_trend: `lb`
+```
+To get the leaderboards of your server
+```
+"""
+            ),
+            "Music": discord.Embed(
+                title="MUSIC",
+                color=ctx.author.color,
+                description="""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+
+• :notes: `p [Music Name]`
+```
+To Play Music
+
+You need to be connected to a VC before running this
+``` 
+
+• :notepad_spiral: `q`
+```
+To get the current queue
+```
+
+• :arrow_right: `skip`
+```
+To Skip the current song
+```
+
+• :pause_button: `pause`
+```
+To pause the playback of music
+```
+
+• :arrow_forward: `resume`
+```
+To resume the playback of music
+```
+
+• :no_entry_sign: `disconnect`
+```
+To stop the music and disconnect from your VC
+```
+"""
+            ),
+            "LON": discord.Embed(
+                title="**L**ACK **O**F **N**ITRO",
+                color=ctx.author.color,
+                description="""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+
+• :smile: `LON [emoji name]`
+```
+To send a webhook with emoji
+```
+
+• :smile: `LONall`
+```
+To send all available emojis
+```
+"""
+            ),
+            "Configuration": discord.Embed(
+                title="CONFIGURATION",
+                color=ctx.author.color,
+                description="""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+
+• :gear: `config`
+```
+To configure the bot in your server
+```
+"""
+            ),
+            "Miscellaneous": discord.Embed(
+                title="MISCELLANEOUS",
+                color=ctx.author.color,
+                description="""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+
+• :sunglasses: `avatar (member)`
+```
+To get the avatar of a member
+
+Defaults to the person who ran this command
+```
+
+• :diamond_shape_with_a_dot_inside: `help`
+```
+This command
+```
+
+• :grey_question: `about (member)`
+```
+To get the Info about a member
+
+Defaults to the person who ran this command
+```
+
+• :grey_exclamation: `stats`
+```
+To get my stats
+```
+
+• :moneybag: `donate`
+```
+Get the patreon link of HackArmour
+```
+"""
             )
-        menu.add_pages(pages)
+        }
+        
+        #########################################################################################
+        
+        ## ==> SEND MESSAGE
+        #########################################################################################
+        
+        await ctx.send(
+            embed=discord.Embed(
+                title="HELP",
+                color=discord.Color.random(),
+                description="What do you want help with?"
+            ),
+            components=[select]
+        )
+        
+        #########################################################################################
+        
+        ## ==> CHECK FOR REACTION AND EDIT THE EMBED
+        #########################################################################################
+        
+        while True:
+            try:
+                reaction = await self.bot.wait_for(
+                    "select_option",
+                    timeout=60.0,
+                    check=lambda i: i.user == ctx.author
+                )
+            except asyncio.TimeoutError:
+                select._disabled = True
+                break
+            try:
+                await reaction.respond(
+                    type=InteractionType.UpdateMessage,
+                    embed = embeds[reaction.component[0].label]
+                )
+            except discord.NotFound: ...
             
-        await menu.open()
+        #########################################################################################
 
     #############################################################################################
 
@@ -105,7 +387,8 @@ class Miscellaneous(commands.Cog):
         embed.add_field(inline=True,name="SERVER",value=f"```\n{ctx.guild}\n```")
         embed.add_field(inline=True,name='TOTAL SERVERS',value=f'```\n{str(len(self.bot.guilds))}\n```')
         embed.set_thumbnail(url=ctx.guild.icon_url)
-        await ctx.send(embed = embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://assistant.hackarmour.tech")]])
+        embed.set_image(url="https://cdn.discordapp.com/attachments/616315208251605005/616319462349602816/Tw.gif")
+        await ctx.send(embed = embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://assistant.hackarmour.tech", emoji = '🔗')]])
 
     #############################################################################################
 
@@ -128,6 +411,7 @@ class Miscellaneous(commands.Cog):
         if user.guild.owner.id == user.id:
             embed.add_field(name="Owner", value=f"{user.mention} is the owner of {user.guild}", inline=False)
         embed.set_thumbnail(url=user.avatar_url)
+        embed.set_image(url="https://cdn.discordapp.com/attachments/616315208251605005/616319462349602816/Tw.gif")
         await ctx.send(embed=embed)
 
     #############################################################################################
@@ -137,9 +421,10 @@ class Miscellaneous(commands.Cog):
 
     @commands.command()
     async def donate(self,ctx: commands.Context) -> None:
-        btn = Button(label="Patreon - Hack Armour", style=ButtonStyle.URL, url = "https://www.patreon.com/hackarmour", id = "embed")
+        btn = Button(label="Patreon - Hack Armour", style=ButtonStyle.URL, url = "https://www.patreon.com/hackarmour", id = "embed", emoji = "🔗")
         embed = discord.Embed(title="Support Us",color=ctx.author.color)
         embed.add_field(name='Please support the development by becoming a patron!',value="Click the Button below to go our Patreon page.")
+        embed.set_image(url="https://cdn.discordapp.com/attachments/616315208251605005/616319462349602816/Tw.gif")
         await ctx.send(components=[[btn]], embed=embed)
 
     ############################################################################################

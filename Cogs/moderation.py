@@ -3,9 +3,9 @@ from discord.ext import commands
 
 
 class Moderation(commands.Cog):
-    def __init__(self,bot):
+    def __init__(self,bot: commands.Bot) -> None:
         self.bot=bot
-        with open("Configuration/ModConfig.json") as f: self.CONFIG = json.loads(f.read())
+        with open("Configuration/ModConfig.json") as f: self.CONFIG = json.load(f)
         self.illegal_words=['Nigger','Nigga','N1gg3r','N1gger','Nigg3r','N1gga','N1gg@','Dick','Fuck','F U C K','f u c k','gandu','gaandu','gaamdu','fuck','nigger','nigga','n1gg3r','n1gga','n1gg@','dick']
     
     def rewrite(self) -> None:
@@ -24,8 +24,8 @@ class Moderation(commands.Cog):
                     if any(word in message.content for word in self.illegal_words):
                         user=message.author
                         await message.delete() #This command deletes the messages if it contains those words
-                        await user.send('Your message was deleted due to use of profane and illegal words and you are temporarily muted for 10 minutes.')#This line sends a dm to user
                         role = discord.utils.get(message.guild.roles,name='Muted') #This command gives the user a muted role, you can change the muted role with any role you want to give but the name is case sensitive
+                        await user.send('Your message was deleted due to use of profane and illegal words and you are temporarily muted for 10 minutes.')#This line sends a dm to user
                         
                         if role is None:
                             role = await message.author.guild.create_role(name="Muted")
@@ -39,16 +39,19 @@ class Moderation(commands.Cog):
                         try: await message.author.remove_roles(role)
                         except Exception: pass
             except KeyError:
-                pass                        
-            
+                pass
+            except discord.errors.Forbidden:
+                pass
         elif (str(message.author.id)=='849673169278468116' and str(message.channel.id)=='839650841522339860'):
             await message.add_reaction('🔥')
             await message.add_reaction('<:dorime:839708454876741652>')
             await message.add_reaction('<:prayge:846337069022445568>')
             
         if f"<@!{self.bot.user.id}>" in message.content:
-            await message.channel.send(embed=discord.Embed(title=f"Hi! I'm {str(self.bot.user)[:-5]}", description="You can use `>help` to get help with my commands",color=message.author.color))
-        
+            try:
+                await message.channel.send(embed=discord.Embed(title=f"Hi! I'm {str(self.bot.user.name)}", description=f"You can use `{self.bot.command_prefix}help` to get help with my commands",color=message.author.color))
+            except discord.Forbidden:
+                pass        
     
     #############################################################################################
         
@@ -118,7 +121,6 @@ class Moderation(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def toggleLog(self, ctx: commands.Context) -> None:
         if str(ctx.guild.id) in self.CONFIG.keys():
-            print(self.CONFIG)
             self.CONFIG[str(ctx.guild.id)]["toggled"] = True if not self.CONFIG[str(ctx.guild.id)]["toggled"] else False
         else:
             self.CONFIG[str(ctx.guild.id)] = {"channel": None, "toggled": True}
