@@ -208,7 +208,13 @@ class LevelingPD(commands.Cog):
             
             
         lb = "\n\n".join([f"{index+1}.  {self.bot.get_user(int(item))}" for index, item in enumerate(_)])
-        await ctx.send(embed=discord.Embed(title="LEADERBOARD", color=ctx.author.color, description=f"```\n{lb}\n```"))
+        await ctx.send(
+            embed=discord.Embed(
+                title="LEADERBOARD",
+                color=discord.Color.from_rgb(46,49,54),
+                description=f"```\n{lb}\n```"
+            )
+        )
 
     #########################################################################################
     
@@ -231,7 +237,7 @@ class LevelingPD(commands.Cog):
             embed=discord.Embed(
                 title="LEVELING",
                 description=f"Leveling has been {enabledordisabled}",
-                color = discord.Color.green() if enabledordisabled == "Enabled" else discord.Color.red()
+                color = discord.Color.from_rgb(46,49,54)
             )
         )
     

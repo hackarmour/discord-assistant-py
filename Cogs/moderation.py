@@ -109,13 +109,20 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def togglemod(self, ctx: commands.Context) -> None:
+        
         if str(ctx.guild.id) in self.CONFIG.keys():
             self.CONFIG[str(ctx.guild.id)]["ModEnabled"] = True if not self.CONFIG[str(ctx.guild.id)]["ModEnabled"] else False
         else:
             self.CONFIG[str(ctx.guild.id)] = {"ModEnabled":True}
         self.rewrite()
         enabledordisabled = 'enabled' if self.CONFIG[str(ctx.guild.id)]["ModEnabled"] else 'disabled'
-        await ctx.send(embed=discord.Embed(title="MODERATION", description=f"The AutoMod Feature has been {enabledordisabled}!", color = ctx.author.color))
+        await ctx.send(
+            embed=discord.Embed(
+                title="MODERATION",
+                description=f"The AutoMod Feature has been {enabledordisabled}!",
+                color=discord.Color.from_rgb(46,49,54)
+            )
+        )
     
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -126,7 +133,16 @@ class Moderation(commands.Cog):
             self.CONFIG[str(ctx.guild.id)] = {"channel": None, "toggled": True}
             
         self.rewrite()
-        await ctx.send(embed=discord.Embed(color=ctx.author.color, title="MODERATION", description="Logs Have Been Toggled"))
+        
+        enabledordisabled = "Enabled" if self.CONFIG[str(ctx.guild.id)]["toggled"] else "Disabled"
+        
+        await ctx.send(
+            embed=discord.Embed(
+                color=discord.Color.from_rgb(46,49,54),
+                title="MODERATION",
+                description=f"Logs Have Been {enabledordisabled}"
+                )
+            )
     
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -136,7 +152,7 @@ class Moderation(commands.Cog):
             else: self.CONFIG[str(ctx.guild.id)]["channel"] = channel.id
             
             self.rewrite()
-            embed = discord.Embed(title="MODERATION",description=f"Logs set to <#{channel.id}> !", color=ctx.author.color)
+            embed = discord.Embed(title="MODERATION",description=f"Logs set to <#{channel.id}> !", color=discord.Color.from_rgb(46,49,54))
             await ctx.send(embed=embed)
         else: return
         

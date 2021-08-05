@@ -48,7 +48,13 @@ class Embeds(commands.Cog):
         try:
             _no_of_fields = int(_no_of_fields.content) if _no_of_fields.content.strip().lower() != "none" else 0
         except ValueError:
-            await ctx.send(embed=discord.Embed(title="Whoops!", description="Please enter the number of fields in an Integer format!\nExiting Command; Please run the command again", color=discord.Color.red()))
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Whoops!",
+                    description="Please enter the number of fields in an Integer format!\nExiting Command; Please run the command again",
+                    color=discord.Color.from_rgb(46,49,54)
+                )
+            )
             
             return
         
@@ -124,9 +130,17 @@ class Embeds(commands.Cog):
         ## ==> SENDING THE EMBED
         ##############################################################################################
         
-        if description is not None: embed = discord.Embed(title=title, description=description, color=ctx.author.color)
+        if description is not None: 
+            embed = discord.Embed(
+                title=title,
+                description=description,
+                color=discord.Color.from_rgb(46,49,54)
+            )
         else:
-            embed=discord.Embed(title=title, color=ctx.author.color)
+            embed=discord.Embed(
+                title=title,
+                color=discord.Color.from_rgb(46,49,54)
+            )
         if footer is not None:
             embed.set_footer(text=footer)
         for i in fields: embed.add_field(name=i[0], value=i[1], inline=i[2])

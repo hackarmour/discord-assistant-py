@@ -131,7 +131,7 @@ class Miscellaneous(commands.Cog):
         embeds = {
             "Moderation": discord.Embed(
                 title="MODERATION",
-                color=ctx.author.color,
+                color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
     
@@ -173,7 +173,7 @@ default is 5
             ),
             "Fun": discord.Embed(
                 title="FUN",
-                color=ctx.author.color,
+                color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
 
@@ -210,7 +210,7 @@ I will meme for you
             ),
             "Leveling": discord.Embed(
                 title="LEVELING",
-                color=ctx.author.color,
+                color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
 
@@ -227,9 +227,12 @@ To get the leaderboards of your server
 ```
 """
             ),
+            
+            ## 35, 39, 42
+            
             "Music": discord.Embed(
                 title="MUSIC",
-                color=ctx.author.color,
+                color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
 
@@ -268,7 +271,7 @@ To stop the music and disconnect from your VC
             ),
             "LON": discord.Embed(
                 title="**L**ACK **O**F **N**ITRO",
-                color=ctx.author.color,
+                color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
 
@@ -285,7 +288,7 @@ To send all available emojis
             ),
             "Configuration": discord.Embed(
                 title="CONFIGURATION",
-                color=ctx.author.color,
+                color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
 
@@ -297,7 +300,7 @@ To configure the bot in your server
             ),
             "Miscellaneous": discord.Embed(
                 title="MISCELLANEOUS",
-                color=ctx.author.color,
+                color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
 
@@ -341,7 +344,7 @@ Get the patreon link of HackArmour
         await ctx.send(
             embed=discord.Embed(
                 title="HELP",
-                color=discord.Color.random(),
+                color=discord.Color.from_rgb(46,49,54),
                 description="What do you want help with?"
             ),
             components=[select]
@@ -360,7 +363,7 @@ Get the patreon link of HackArmour
                     check=lambda i: i.user == ctx.author
                 )
             except asyncio.TimeoutError:
-                select._disabled = True
+                select.disabled = True
                 break
             try:
                 await reaction.respond(
@@ -379,7 +382,7 @@ Get the patreon link of HackArmour
     @commands.command()
     async def stats(self,ctx: commands.Context) -> None:
         pyver = str(sys.version[:6])
-        embed = discord.Embed(title="STATS",color=ctx.author.color,inline=False)
+        embed = discord.Embed(title="STATS",color=discord.Color.from_rgb(46,49,54),inline=False)
         embed.add_field(inline=True,name="UPTIME",value=f"```\n{str(datetime.timedelta(seconds=int(round(time() - self.STARTTIME))))}\n```")
         embed.add_field(inline=True,name="PING",value=f"```\n{round(self.bot.latency * 1000)}ms\n```")
         embed.add_field(inline=True,name="DISCORD.PY VERSION",value=f"```\n{discord.__version__}\n```")
@@ -422,7 +425,7 @@ Get the patreon link of HackArmour
     @commands.command()
     async def donate(self,ctx: commands.Context) -> None:
         btn = Button(label="Patreon - Hack Armour", style=ButtonStyle.URL, url = "https://www.patreon.com/hackarmour", id = "embed", emoji = "🔗")
-        embed = discord.Embed(title="Support Us",color=ctx.author.color)
+        embed = discord.Embed(title="Support Us",color=discord.Color.from_rgb(46,49,54))
         embed.add_field(name='Please support the development by becoming a patron!',value="Click the Button below to go our Patreon page.")
         embed.set_image(url="https://cdn.discordapp.com/attachments/616315208251605005/616319462349602816/Tw.gif")
         await ctx.send(components=[[btn]], embed=embed)

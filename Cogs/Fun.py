@@ -66,7 +66,7 @@ class Fun(commands.Cog):
         embed = discord.Embed(
                 title="ROCK PAPER SCISSORS",
                 description=f"{ctx.author.mention} - Blue\n{p2.mention} - Red",
-                color=ctx.author.color
+                color=discord.Color.from_rgb(46,49,54)
         )
         
         ## ==> SEND MESSAGE
@@ -119,7 +119,7 @@ class Fun(commands.Cog):
                     embed=discord.Embed(
                         title="ROCK PAPER SCISSORS",
                         description=desc,
-                        color=ctx.author.color
+                        color=discord.Color.from_rgb(46,49,54)
                     ),
                     components=[p1Buttons, p2Buttons]
                 )
@@ -147,7 +147,7 @@ class Fun(commands.Cog):
                     embed=discord.Embed(
                         title="ROCK PAPER SCISSORS",
                         description=desc,
-                        color=p2.color
+                        color=discord.Color.from_rgb(46,49,54)
                     ),
                     components=[p1Buttons, p2Buttons]
                 )
@@ -182,7 +182,7 @@ class Fun(commands.Cog):
 
 **{ctx.author.mention} has won!**
 """,
-                    color=ctx.author.color
+                    color=discord.Color.from_rgb(46,49,54)
                 ),
                 components=[]
             )
@@ -203,7 +203,7 @@ class Fun(commands.Cog):
 
 **{p2.mention} has won!**
 """,
-                    color=p2.color
+                    color=discord.Color.from_rgb(46,49,54)
                 ),
                 components=[]
             )
@@ -216,7 +216,7 @@ class Fun(commands.Cog):
                 embed=discord.Embed(
                     title="ROCK PAPER SCISSOR",
                     description="Both of you chose the same Button, so the game is drawed",
-                    color=discord.Color.blurple
+                    color=discord.Color.from_rgb(46,49,54)
                 ),
                 components=[]
             )
@@ -257,7 +257,7 @@ class Fun(commands.Cog):
         embed = discord.Embed(
             title="TIC TAC TOE",
             description=f"{p2.mention},{ctx.author.mention} invites you to a game of Tic Tac Toe!",
-            color=ctx.author.color
+            color=discord.Color.from_rgb(46,49,54)
         )
         message = await ctx.send(
             embed=embed,
@@ -272,17 +272,33 @@ class Fun(commands.Cog):
                 embed=discord.Embed(
                     title="TIC TAC TOE",
                     description=f"Oh no! {p2.name} didn't click any button on time",
-                    color=discord.Color.red()
+                    color=discord.Color.from_rgb(46,49,54)
                     ),
                 components=[]
             )
             return
         
         if res.component.label == "Accept":
-            await res.respond(type = InteractionType.UpdateMessage, embed=discord.Embed(title=f"Game between {ctx.author.name} and {p2.name}", description="Please wait for the bot to respond with all emojis", color=discord.Color.green()), components = [])
+            await res.respond(
+                type = InteractionType.UpdateMessage,
+                embed=discord.Embed(
+                    title=f"Game between {ctx.author.name} and {p2.name}",
+                    description="Please wait for the bot to respond with all emojis",
+                    color=discord.Color.from_rgb(46,49,54)
+                ),
+                components = []
+            )
             await asyncio.sleep(2.0)
         elif res.component.label == "Decline":
-            await res.respond(type = InteractionType.UpdateMessage, embed=discord.Embed(title=f"Game between {ctx.author.name} and {p2.name}", description="Match Declined",color=discord.Color.red()), components = [])
+            await res.respond(
+                type = InteractionType.UpdateMessage,
+                embed=discord.Embed(
+                    title=f"Game between {ctx.author.name} and {p2.name}",
+                    description="Match Declined",
+                    color=discord.Color.from_rgb(46,49,54)
+                ),
+                components = []
+            )
             return
         
         ##############################################################################################
@@ -293,7 +309,7 @@ class Fun(commands.Cog):
         embed = discord.Embed(
             title=f"Game Between {ctx.author.name} and {p2.name}", 
             description="".join(self._board_template), 
-            color=ctx.author.color
+            color=discord.Color.from_rgb(46,49,54)
         )
         embed.set_footer(text=f"{ctx.author.name}'s Turn")
         await message.edit(embed = embed)
@@ -365,7 +381,7 @@ class Fun(commands.Cog):
             except asyncio.TimeoutError:
                 await message.edit(
                     embed=discord.Embed(
-                        color=discord.Color.green(),
+                        color=discord.Color.from_rgb(46,49,54),
                         title=f"Game Between {ctx.author.name} and {p2.name}",
                         description=f"{ctx.author.name if _turn == p2 else p2.name} has won the game since {p2.name if _turn == p2 else ctx.author.name} didn't respond in time!"
                     )
@@ -420,7 +436,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=ctx.author.color,
+                        color=discord.Color.from_rgb(46,49,54),
                         description=f"{_turn} has won the Game!"
                     )
                 )
@@ -431,7 +447,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=ctx.author.color,
+                        color=discord.Color.from_rgb(46,49,54),
                         description=f"{_turn} has won the Game!"
                     )
                 )
@@ -442,7 +458,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=ctx.author.color,
+                        color=discord.Color.from_rgb(46,49,54),
                         description=f"{_turn} has won the Game!"
                     )
                 )
@@ -453,7 +469,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=ctx.author.color,
+                        color=discord.Color.from_rgb(46,49,54),
                         description=f"{_turn} has won the Game!"
                     )
                 )
@@ -464,7 +480,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=ctx.author.color,
+                        color=discord.Color.from_rgb(46,49,54),
                         description=f"{_turn} has won the Game!"
                     )
                 )
@@ -475,7 +491,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=ctx.author.color,
+                        color=discord.Color.from_rgb(46,49,54),
                         description=f"{_turn} has won the Game!"
                     )
                 )
@@ -486,7 +502,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=ctx.author.color,
+                        color=discord.Color.from_rgb(46,49,54),
                         description=f"{_turn} has won the Game!"
                     )
                 )
@@ -497,7 +513,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=ctx.author.color,
+                        color=discord.Color.from_rgb(46,49,54),
                         description=f"{_turn} has won the Game!"
                     )
                 )
@@ -545,7 +561,7 @@ class Fun(commands.Cog):
             
             embed = discord.Embed(
                 title=f"Game Between {ctx.author.name} and {p2.name}",
-                color=ctx.author.color,
+                color=discord.Color.from_rgb(46,49,54),
                 description="".join(_current_board)
             )
             embed.set_footer(text=f"{_turn.name}'s Turn")
@@ -566,7 +582,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.green(),
+                        color=discord.Color.from_rgb(46,49,54),
                         description="Game Draw!"
                     )
                 )
@@ -581,7 +597,7 @@ class Fun(commands.Cog):
             embed = discord.Embed(
                 title=f"Game Between {ctx.author.name} and {p2.name}",
                 description=f"Final Board:\n{''.join(_current_board)}",
-                color=ctx.author.color
+                color=discord.Color.from_rgb(46,49,54)
             )            
         )
         
@@ -598,7 +614,7 @@ class Fun(commands.Cog):
             embed=discord.Embed(
                 title="COIN FLIP",
                 description=f"Coin has been Tossed: {choice(['Heads', 'Tails'])}",
-                color=discord.Color.green()
+                color=discord.Color.from_rgb(46,49,54)
             )
         )
 
@@ -631,7 +647,7 @@ class Fun(commands.Cog):
     @commands.command(aliases=['8ball'])
     async def eightBall(self, ctx: commands.Context, *, question) -> None:
         embed = discord.Embed(
-            color=ctx.author.color,
+            color=discord.Color.from_rgb(46,49,54),
             title="8BALL",
             description=f"Question - {question}?\nAnswer - {choice(self.EIGHT_BALL_ANSWERS)}"
         )
@@ -650,7 +666,7 @@ class Fun(commands.Cog):
             res = r.json()
             if res["nsfw"]:
                 continue
-            embed_ = discord.Embed(title=res['title'],color=discord.Color.blue())
+            embed_ = discord.Embed(title=res['title'],color=discord.Color.from_rgb(46,49,54))
             embed_.set_image(url = res["image"])
             embed_.set_author(name = ctx.author,icon_url = ctx.author.avatar_url)
             embed_.set_footer(text=f"👍 {res['ups']} **|** 👎 {res['downs']}")
