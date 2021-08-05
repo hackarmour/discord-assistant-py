@@ -17,27 +17,10 @@ class Miscellaneous(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error) -> None:
-        print(type(error))
         if isinstance(error, commands.CommandNotFound):
             pass
         elif isinstance(error, commands.MissingRequiredArgument):
-            if (str(ctx.command) == "ban" or str(ctx.command) == "kick") and isinstance(error, commands.MissingRequiredArgument):
-                await ctx.send(embed=discord.Embed(title="Whoops", description=f"Tell me the user you want to {str(ctx.command)} too!", color=discord.Color.red()))
-            elif str(ctx.command) == "unban" and isinstance(error, commands.MemberNotFound):
-                await ctx.send(embed=discord.Embed(title="Whoops", description=f"Pass Either the ID of the user or `name#discriminator` for me to identify them", color=discord.Color.red()))
-            elif str(ctx.command) == "SetWelcomeMessage":
-                await ctx.send(embed=discord.Embed(title="Whoops", description=f"Enter the Message for me to welcome users with!", color=discord.Color.red()))
-            elif str(ctx.command) == "SetLeaveMessage":
-                await ctx.send(embed=discord.Embed(title="Whoops", description=f"Enter the Message for me to send if someone leaves!", color=discord.Color.red()))
-            elif str(ctx.command) == "setWelcomeChannel":
-                await ctx.send(embed=discord.Embed(title="Whoops", description=f"Mention the channel where I will welcome users", color=discord.Color.red()))
-            elif str(ctx.command) == "ttt":
-                await ctx.send(embed=discord.Embed(title="Whoops", description="Please pass the user with whom you want to play TicTacToe too!", color = discord.Color.red()))
-            elif str(ctx.command) == "Embed":
-                await ctx.send(embed=discord.Embed(title="Whoops", description="Please mention the channel you want to send embed to", color=discord.Color.red()))
-            else:
-                await ctx.send(embed=discord.Embed(title="Whoops", description="Please pass all the arguements for that command", color = discord.Color.red()))
-            
+            pass
         elif str(ctx.command) == "setWelcomerChannel" and isinstance(error, commands.ChannelNotFound):
             await ctx.send(embed=discord.Embed(title="Whoops", description=f"That channel doesn't Exist!", color=discord.Color.red()))
         elif str(ctx.command) == "setWelcomerChannel" and isinstance(error, commands.ChannelNotReadable):
@@ -49,8 +32,14 @@ class Miscellaneous(commands.Cog):
         elif isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(title="Whoops", description="You are missing Permissions to do that!", color=discord.Color.red()))
         else:
-            await ctx.send(embed=discord.Embed(title="Whoops", description=f"An Unexpected Error has popped out of nowhere: {error}", color = discord.Color.red()))
-
+            if str(error).endswith("Missing Permissions"): return
+            embed = discord.Embed(
+                    title='ERROR',
+                    description=f"Error message:\n**{error}**\n\nCommand: **{ctx.command}**",
+                    color=discord.Color.from_rgb(46,49,54)
+                )
+            embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
+            await self.bot.get_channel(872818862742204487).send(embed=embed)
             
     ##############################################################################################
 

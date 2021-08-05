@@ -25,7 +25,6 @@ class Moderation(commands.Cog):
                         user=message.author
                         await message.delete() #This command deletes the messages if it contains those words
                         role = discord.utils.get(message.guild.roles,name='Muted') #This command gives the user a muted role, you can change the muted role with any role you want to give but the name is case sensitive
-                        await user.send('Your message was deleted due to use of profane and illegal words and you are temporarily muted for 10 minutes.')#This line sends a dm to user
                         
                         if role is None:
                             role = await message.author.guild.create_role(name="Muted")
@@ -35,12 +34,14 @@ class Moderation(commands.Cog):
             
                         
                         await message.author.add_roles(role)
+                        await user.send('Your message was deleted due to use of profane and illegal words and you are temporarily muted for 10 minutes.')#This line sends a dm to user
+                        
                         await asyncio.sleep(600.0) #this is  a timer of 10 mins, after 10 mins the role gets removed automatically.
                         try: await message.author.remove_roles(role)
                         except Exception: pass
             except KeyError:
                 pass
-            except discord.errors.Forbidden:
+            except discord.Forbidden:
                 pass
         elif (str(message.author.id)=='849673169278468116' and str(message.channel.id)=='839650841522339860'):
             await message.add_reaction('🔥')

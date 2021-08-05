@@ -106,7 +106,7 @@ class Fun(commands.Cog):
             if reaction.component.id in ['p1r', 'p1p','p1s'] and reaction.user == ctx.author:
                 
                 ## ==> DISABLE ALL THE BUTTONS FOR P1
-                for i in p1Buttons: i._disabled = True
+                for i in p1Buttons: i.disabled = True
                 
                 ## ==> TO CHECK IF THIS IS THE LAST REACTION
                 if i == 1: 

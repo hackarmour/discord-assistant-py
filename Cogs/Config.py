@@ -95,7 +95,7 @@ Legends:
                     check = lambda i: i.user == ctx.author
                 )
             except asyncio.TimeoutError:
-                select._disabled = True
+                select.disabled = True
                 return
             
             ## ==> WELCOMER
