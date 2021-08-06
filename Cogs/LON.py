@@ -1,37 +1,53 @@
 import asyncio
 import discord
+from discord import Webhook, AsyncWebhookAdapter
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
 import json
 from dpymenus import PaginatedMenu, Page
+import aiohttp
 class LON(commands.Cog):
     def __init__(self,bot):
         self.bot=bot
 
     @commands.command()
     @commands.cooldown(1,60,BucketType.user)  #A cooldown so that this command can be used by individual once in minute to prevent spam.
-    async def lon(self,ctx,emojiName):
-        with open('Configuration/emojis.json') as f:  #Opening json file to read all the data
-            allEmojis=json.load(f)  # Reading all the data of json file
-            allJsonKeys=list(allEmojis.keys())  #Extracting keys from json file to perform check
-
-        if (emojiName in allJsonKeys):  #Checking if emoji name is in file if yes...
-            emoji=allEmojis[emojiName] ##..Extracting emoji from the json file
-            await ctx.message.delete()  #Deleting the message.
-            webhook=await ctx.channel.create_webhook(name='Assistant')  #Creating a webhook with name "Assistant"
-            if (ctx.author.nick==None): ##Checking if the author has nickname if no name variable is set to author's name
-                name=ctx.author.name
-            elif (ctx.author.nick!=None):  #Else name variable is set to author's nickname
-                name=ctx.author.nick
-            await webhook.send(emoji,username=name,avatar_url=ctx.author.avatar_url)  #Sending webhook with content as emoji, username as name variable and avatar as author's avatar
-            await asyncio.sleep(20.0)
-            '''Timer of 20seconds so that the webhook can be removed after 20seconds for 2 reasons.
-            1. Not to exceed the limit of 10 webhooks per channel.
-            2. To prevent rate limit as immediate deletion can use bot to be rate limited by the discord to prevent spam.'''
-            await webhook.delete()  #Deleting the webhook, This will only delete webhook but not the message.
-        elif (emojiName not in allJsonKeys): #..If emoji name is not in list then sending the message written below.
-            await ctx.send("Sorry, this emoji doesn't exist.")
-
+    async def lon(self,ctx,emoji):
+        if ctx.author.nick!=None: # checking if author has a nick name if yes, the webhook will use his/her nickname else username
+            name=ctx.author.nick
+        else:
+            name=ctx.author.name
+        with open('Configuration/emojis.json') as f: # opening emojis.json to check for emojis
+            allEmojis=json.load(f) # loadig all the emojis
+            emojiNames=list(allEmojis.keys()) # extracting all the custom names given to emojis
+        if emoji.lower() not in emojiNames: # checking if emojiname exists in json file if it doesn't send the message and stop execution of command.
+            await ctx.send("This emoji does not exist")
+            return
+        await ctx.message.delete()
+        emoji=allEmojis[emoji.lower()] # getting emoji from json file
+        allwebhooks=await ctx.channel.webhooks()  # getting all the webhooks of channel
+        data=[]  # an empty list to add emoji's id
+        for webhook in allwebhooks: # iterating through all the webhooks and adding webhook id in list
+            data.append(webhook.id)
+        with open('Configuration/webhooks.json') as f: # opening webhooks.json file to fetch webhook previously created by bot
+            webhookdata=json.load(f)
+        if str(ctx.channel.id) in list(webhookdata.keys()): # Checking if bot previously created a webhook 
+            for webId in data: # Going through all the webhooks id's present in list
+                if str(webId) in webhookdata[str(ctx.channel.id)]: # checking if the webhook previously created by bot still exists. then sending the emoji using webhook
+                    async with aiohttp.ClientSession() as session:
+                        webhook = Webhook.from_url(webhookdata[str(ctx.channel.id)], adapter=AsyncWebhookAdapter(session))
+                        await webhook.send(emoji, username=name,avatar_url=ctx.author.avatar_url)
+                        return
+        """If there is no webhook previously created by bot then creating a new webhook with the name assistant"""
+        newWebhook=await ctx.channel.create_webhook(name="Assistant")
+        webhookdata[str(ctx.channel.id)]=f"https://discord.com/api/webhooks/{newWebhook.id}/{newWebhook.token}" # making a complete url of new webhook
+        with open('Configuration/webhooks.json','w') as f: # saving this url in json file for after use
+            json.dump(webhookdata,f,indent=4)
+        with open('Configuration/webhooks.json') as f: # opening json file again to get the url and send the webhook
+            allWebhooks=json.load(f)
+        async with aiohttp.ClientSession() as session:
+                    webhook = Webhook.from_url(allWebhooks[str(ctx.channel.id)], adapter=AsyncWebhookAdapter(session))
+                    await webhook.send(emoji, username=name,avatar_url=ctx.author.avatar_url)
 
     @commands.command()
     async def lonall(self,ctx):
