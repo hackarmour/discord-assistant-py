@@ -57,6 +57,8 @@ class Moderation(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message_edit(self,message_before,message_after):
+        if str(message_before.content)==str(message_after.content):
+            return
         if str(message_before.guild.id) in self.CONFIG.keys():
             try:
                 if self.CONFIG[str(message_before.guild.id)]["toggled"] and self.CONFIG[str(message_before.guild.id)]["channel"] != None:        
