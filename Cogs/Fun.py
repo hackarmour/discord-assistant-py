@@ -230,24 +230,15 @@ class Fun(commands.Cog):
     #############################################################################################
     
     @commands.command()
-    @commands.guild_only()
     async def ttt(self, ctx: commands.Context, p2: commands.MemberConverter) -> None:
-        
-        ## ==> CHECKS
-        ##############################################################################################
-        
         if ctx.author.bot: return
         if p2.bot: 
             await ctx.send("You can't play against a bot!")
             return
-        if ctx.author.id == p2.id:
+        if ctx.author == p2:
             await ctx.send("You can't invite yourself!")
             return
         
-        ##############################################################################################
-        
-        ## ==> ASK FOR A GAME
-        #############################################################################################
         
         ## ==> BUTTONS
         accept = Button(label="Accept", style=ButtonStyle.green)
@@ -278,17 +269,20 @@ class Fun(commands.Cog):
             )
             return
         
+        ## ==> CONTINUE THE GAME IF THE USER CLICKED ACCEPT BUTTON
         if res.component.label == "Accept":
             await res.respond(
                 type = InteractionType.UpdateMessage,
                 embed=discord.Embed(
                     title=f"Game between {ctx.author.name} and {p2.name}",
-                    description="Please wait for the bot to respond with all emojis",
+                    description="Get ready to play!",
                     color=discord.Color.from_rgb(46,49,54)
                 ),
                 components = []
             )
             await asyncio.sleep(2.0)
+            
+        ## ==> STOP THE GAME IF USER PRESSED DECLINE BUTTON
         elif res.component.label == "Decline":
             await res.respond(
                 type = InteractionType.UpdateMessage,
@@ -301,309 +295,181 @@ class Fun(commands.Cog):
             )
             return
         
+        ## ==> START GAME
         ##############################################################################################
         
-        ## ==> EDIT THE EMBED TO SET THE GRID
-        ##############################################################################################
-        
-        embed = discord.Embed(
-            title=f"Game Between {ctx.author.name} and {p2.name}", 
-            description="".join(self._board_template), 
-            color=discord.Color.from_rgb(46,49,54)
-        )
-        embed.set_footer(text=f"{ctx.author.name}'s Turn")
-        await message.edit(embed = embed)
-                
-        ##############################################################################################
+        ## ==> BOARD
+        board = [
+            [Button(label = " ", style=ButtonStyle.green, id="0"), Button(label = " ", style=ButtonStyle.green, id="1"), Button(label = " ", style=ButtonStyle.green, id="2")],
+            [Button(label = " ", style=ButtonStyle.green, id="3"), Button(label = " ", style=ButtonStyle.green, id="4"), Button(label = " ", style=ButtonStyle.green, id="5")],
+            [Button(label = " ", style=ButtonStyle.green, id="6"), Button(label = " ", style=ButtonStyle.green, id="7"), Button(label = " ", style=ButtonStyle.green, id="8")]
+        ]
         
         ## ==> VARIABLES
-        ##############################################################################################
+        i, _turn = 0, ctx.author
         
-        _turn = ctx.author
-        _current_board = self._board_template.copy()
-        self.data[f"{ctx.author.id} & {p2.id}"] = {"CUR_REACTION": None, "TURN_NO": 1}
-        
-        ##############################################################################################
-        
-        ## ==> ADD REACTIONS
-        ##############################################################################################
-        
-        for i in self._emoji_template: await message.add_reaction(i)
-        
-        ##############################################################################################
-        
-        ## ==> CHECK FOR `wait_for`
-        ##############################################################################################
-        
-        def check(reaction, user):
-            if user == _turn:
-                self.data[F"{ctx.author.id} & {p2.id}"]["CUR_REACTION"] = str(reaction.emoji)
-            return user == _turn
-        
-        ##############################################################################################        
-           
-        ## ==> MAIN LOOP
-        ##############################################################################################
-        
-        while True:
-            
-            ## ==> TO CHECK IF WHAT THE USER REACTED WITH IS VALID OR NOT
-            ##############################################################################################
-            
-            x = []
-            for index, item in enumerate(_current_board):
-                if item == ":white_large_square:" or item == ":white_large_square:\n":
-                    if index == 0:
-                        x.append(self._emoji_template[0])
-                    if index == 1:
-                        x.append(self._emoji_template[1])
-                    if index == 2:
-                        x.append(self._emoji_template[2])
-                    if index == 3:
-                        x.append(self._emoji_template[3])
-                    if index == 4:
-                        x.append(self._emoji_template[4])
-                    if index == 5:
-                        x.append(self._emoji_template[5])
-                    if index == 6:
-                        x.append(self._emoji_template[6])
-                    if index == 7:
-                        x.append(self._emoji_template[7])
-                    if index == 8:
-                        x.append(self._emoji_template[8])
-            
-            ##############################################################################################
-            
-            ## ==> WAIT FOR PLAYER TO REACT
-            ##############################################################################################
-            
-            try: await self.bot.wait_for("reaction_add", timeout=25.0, check=check)
-            except asyncio.TimeoutError:
-                await message.edit(
-                    embed=discord.Embed(
-                        color=discord.Color.from_rgb(46,49,54),
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        description=f"{ctx.author.name if _turn == p2 else p2.name} has won the game since {p2.name if _turn == p2 else ctx.author.name} didn't respond in time!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-                
-            ##############################################################################################
-            
-            ## ==> CHECK IF REACTION WAS VALID OR NOT
-            ##############################################################################################
-            
-            if self.data[f"{ctx.author.id} & {p2.id}"]["CUR_REACTION"] not in x:
-                await message.remove_reaction(self.data[f"{ctx.author.id} & {p2.id}"]["CUR_REACTION"], _turn)
-                continue
-            
-            ##############################################################################################
-            
-            ## ==> PUT THE MARK ON THE BOARD
-            ##############################################################################################
-            
-            index = f"{ctx.author.id} & {p2.id}"
-                
-            mark = ":x:" if _turn == ctx.author else ":o:"
-                
-            if self.data[index]["CUR_REACTION"] == self._emoji_template[0]:
-                _current_board[0] = mark
-            elif self.data[index]["CUR_REACTION"] == self._emoji_template[1]:
-                _current_board[1] = mark
-            elif self.data[index]["CUR_REACTION"] == self._emoji_template[2]:
-                _current_board[2] = f"{mark}\n"
-            elif self.data[index]["CUR_REACTION"] == self._emoji_template[3]:
-                _current_board[3] = mark
-            elif self.data[index]["CUR_REACTION"] == self._emoji_template[4]:
-                _current_board[4] = mark
-            elif self.data[index]["CUR_REACTION"] == self._emoji_template[5]:
-                _current_board[5] = f"{mark}\n"
-            elif self.data[index]["CUR_REACTION"] == self._emoji_template[6]:
-                _current_board[6] = mark
-            elif self.data[index]["CUR_REACTION"] == self._emoji_template[7]:
-                _current_board[7] = mark
-            elif self.data[index]["CUR_REACTION"] == self._emoji_template[8]:
-                _current_board[8] = mark
-            
-            ##############################################################################################
-            
-            ## ==> CHECK FOR WINNER
-            ##############################################################################################
-            
-            if (_current_board[0], _current_board[1], _current_board[2]) == (":x:", ":x:", ":x:\n") or (_current_board[0], _current_board[1], _current_board[2]) == (":o:", ":o:", ":o:\n"): 
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description=f"{_turn} has won the Game!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            elif (_current_board[3], _current_board[4], _current_board[5]) == (":x:", ":x:", ":x:\n") or (_current_board[3], _current_board[4], _current_board[5]) == (":o:", ":o:", ":o:\n"): 
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description=f"{_turn} has won the Game!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            elif (_current_board[6], _current_board[7], _current_board[8]) == (":x:", ":x:", ":x:") or (_current_board[6], _current_board[7], _current_board[8]) == (":o:", ":o:", ":o:"): 
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description=f"{_turn} has won the Game!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            elif (_current_board[0], _current_board[3], _current_board[6]) == (":x:", ":x:", ":x:") or (_current_board[0], _current_board[3], _current_board[6]) == (":o:", ":o:", ":o:"): 
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description=f"{_turn} has won the Game!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            elif (_current_board[1], _current_board[4], _current_board[7]) == (":x:", ":x:", ":x:") or (_current_board[1], _current_board[4], _current_board[7]) == (":o:", ":o:", ":o:"): 
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description=f"{_turn} has won the Game!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            elif (_current_board[2], _current_board[5], _current_board[8]) == (":x:\n", ":x:\n", ":x:") or (_current_board[2], _current_board[5], _current_board[8]) == (":o:\n", ":o:\n", ":o:"): 
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description=f"{_turn} has won the Game!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            elif (_current_board[0], _current_board[4], _current_board[8]) == (":x:", ":x:", ":x:") or (_current_board[0], _current_board[4], _current_board[8]) == (":o:", ":o:", ":o:"): 
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description=f"{_turn} has won the Game!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            elif (_current_board[2], _current_board[4], _current_board[6]) == (":x:\n", ":x:", ":x:") or (_current_board[2], _current_board[4], _current_board[6]) == (":o:\n", ":o:", ":o:"): 
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description=f"{_turn} has won the Game!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            
-            ##############################################################################################
-            
-            ## ==> CHANGE THE TURN TO THE OTHER PLAYER
-            ##############################################################################################
-            
-            _turn = p2 if _turn == ctx.author else ctx.author
-            
-            ##############################################################################################            
-            
-            ## ==> RESET X FOR THE BOT TO REACT TO THE EMBED
-            ##############################################################################################
-            
-            x = []
-            for index, item in enumerate(_current_board):
-                if item == ":white_large_square:" or item == ":white_large_square:\n":
-                    if index == 0:
-                        x.append(self._emoji_template[0])
-                    if index == 1:
-                        x.append(self._emoji_template[1])
-                    if index == 2:
-                        x.append(self._emoji_template[2])
-                    if index == 3:
-                        x.append(self._emoji_template[3])
-                    if index == 4:
-                        x.append(self._emoji_template[4])
-                    if index == 5:
-                        x.append(self._emoji_template[5])
-                    if index == 6:
-                        x.append(self._emoji_template[6])
-                    if index == 7:
-                        x.append(self._emoji_template[7])
-                    if index == 8:
-                        x.append(self._emoji_template[8])
-            
-            ##############################################################################################
-            
-            ## ==> UPDATE THE EMBED
-            ##############################################################################################
-            
-            embed = discord.Embed(
-                title=f"Game Between {ctx.author.name} and {p2.name}",
+        ## ==> EDIT THE MESSAGE TO START GAME
+        await message.edit(
+            embed=discord.Embed(
+                title="TIC TAC TOE",
                 color=discord.Color.from_rgb(46,49,54),
-                description="".join(_current_board)
-            )
-            embed.set_footer(text=f"{_turn.name}'s Turn")
-            await message.edit(embed=embed)
-            await message.clear_reactions()
-            for i in x: await message.add_reaction(i)
-            del x
-            
-            ##############################################################################################
-            
-            ## ==> UPDATE TURN NUMBER
-            ##############################################################################################
-            
-            # IF TURN NUMBER = 9, GAME IS OVER
-            
-            if self.data[f"{ctx.author.id} & {p2.id}"]["TURN_NO"] == 9:
-                await message.clear_reactions()
-                await message.edit(
-                    embed=discord.Embed(
-                        title=f"Game Between {ctx.author.name} and {p2.name}",
-                        color=discord.Color.from_rgb(46,49,54),
-                        description="Game Draw!"
-                    )
-                )
-                del self.data[f"{ctx.author.id} & {p2.id}"]
-                break
-            
-            self.data[f"{ctx.author.id} & {p2.id}"]["TURN_NO"] += 1
-            
-            ##############################################################################################
-        
-        await ctx.send(
-            embed = discord.Embed(
-                title=f"Game Between {ctx.author.name} and {p2.name}",
-                description=f"Final Board:\n{''.join(_current_board)}",
-                color=discord.Color.from_rgb(46,49,54)
-            )            
+                description=f"{_turn.mention}'s turn"
+            ),
+            components=board
         )
         
+        ## ==> MAIN LOOP
         ##############################################################################################
-    
-    #############################################################################################
+        while i < 9:
+            
+            ## ==> GET INTERACTION
+            try:
+                interaction = await self.bot.wait_for(
+                    "button_click",
+                    timeout=25,
+                    check=lambda i: i.user == _turn
+                )
+                
+            ## ==> THIS IS RAN ONLY WHEN THERE IS A TIMEOUT
+            except asyncio.TimeoutError:
+                oppositeTurn = ctx.author.mention if _turn == p2 else p2.mention
+                
+                ## ==> DISABLE ALL THE BUTTONS
+                for j in board: 
+                    for k in j: k.disabled = True
+                    
+                ## ==> EDIT MESSAGE AND DECLARE WINNER
+                await message.edit(
+                    embed=discord.Embed(
+                        title="TIC TAC TOE",
+                        color=discord.Color.from_rgb(46,49,54),
+                        description=f"{oppositeTurn} has **won** the game since {_turn.mention} didn't click on any buttons in time!"
+                    ),
+                    components=board
+                )
+                
+                return
+            
+            
+            ## ==> CHECK IF THE BUTTON PRESSED IS OCCUPIED
+            if interaction.component.id == "occupied":
+                await interaction.respond(
+                    InteractionType = InteractionType.ChannelMessageWithSource,
+                    content="That Place is occupied"
+                )
+                continue
+
+            ## ==> EMPTY LIST
+            indexes = []
+            
+            ## ==> GET THE INDEXES OF THE BUTTON PRESSED
+            for index, item in enumerate(board):
+                for index2, item2 in enumerate(item):
+                    if item2.id == interaction.component.id:
+                        indexes.append(index)
+                        indexes.append(index2)
+            
+            ## ==> CHANGE THE MARK AND ID
+            board[indexes[0]][indexes[1]].style = ButtonStyle.red if _turn == ctx.author else ButtonStyle.blue
+            board[indexes[0]][indexes[1]].id = "occupied"
+            
+            ## ==> CHANGE TURN
+            _turn = ctx.author if _turn == p2 else p2
+
+            
+            ## ==> CHECK IF ANYONE WON
+            winCondition = (
+                (board[0][0].style, board[1][0].style, board[2][0].style) == (ButtonStyle.red, ButtonStyle.red, ButtonStyle.red) 
+                or
+                (board[0][1].style, board[1][1].style, board[2][1].style) == (ButtonStyle.red, ButtonStyle.red, ButtonStyle.red)
+                or
+                (board[0][2].style, board[1][2].style, board[2][2].style) == (ButtonStyle.red, ButtonStyle.red, ButtonStyle.red)
+                or 
+                (board[0][0].style, board[1][1].style, board[2][2].style) == (ButtonStyle.red, ButtonStyle.red, ButtonStyle.red)
+                or
+                (board[0][2].style, board[1][1].style, board[2][0].style) == (ButtonStyle.red, ButtonStyle.red, ButtonStyle.red)
+                or
+                (board[0][0].style, board[0][1].style, board[0][2].style) == (ButtonStyle.red, ButtonStyle.red, ButtonStyle.red)
+                or
+                (board[1][0].style, board[1][1].style, board[1][2].style) == (ButtonStyle.red, ButtonStyle.red, ButtonStyle.red)
+                or
+                (board[2][0].style, board[2][1].style, board[2][2].style) == (ButtonStyle.red, ButtonStyle.red, ButtonStyle.red)
+            
+                or
+                
+                (board[0][0].style, board[1][0].style, board[2][0].style) == (ButtonStyle.blue, ButtonStyle.blue, ButtonStyle.blue) 
+                or
+                (board[0][1].style, board[1][1].style, board[2][1].style) == (ButtonStyle.blue, ButtonStyle.blue, ButtonStyle.blue)
+                or
+                (board[0][2].style, board[1][2].style, board[2][2].style) == (ButtonStyle.blue, ButtonStyle.blue, ButtonStyle.blue)
+                or 
+                (board[0][0].style, board[1][1].style, board[2][2].style) == (ButtonStyle.blue, ButtonStyle.blue, ButtonStyle.blue)
+                or
+                (board[0][2].style, board[1][1].style, board[2][0].style) == (ButtonStyle.blue, ButtonStyle.blue, ButtonStyle.blue)
+                or
+                (board[0][0].style, board[0][1].style, board[0][2].style) == (ButtonStyle.blue, ButtonStyle.blue, ButtonStyle.blue)
+                or
+                (board[1][0].style, board[1][1].style, board[1][2].style) == (ButtonStyle.blue, ButtonStyle.blue, ButtonStyle.blue)
+                or
+                (board[2][0].style, board[2][1].style, board[2][2].style) == (ButtonStyle.blue, ButtonStyle.blue, ButtonStyle.blue)
+            )
+
+            ## ==> RAN IF ANYONE WON
+            if winCondition:
+                
+                ## ==> DISABLE BUTTONS
+                for j in board: 
+                    for k in j: k.disabled = True
+                    
+                ## ==> ANNOUNCE WINNER
+                await interaction.respond(
+                    type=InteractionType.UpdateMessage,
+                    embed=discord.Embed(
+                        title="TIC TAC TOE",
+                        color = discord.Color.from_rgb(46,49,54),
+                        description=f"{p2.mention if _turn == ctx.author else ctx.author.mention} **has won!**"
+                    ),
+                    components=board
+                )
+                return
+            
+            ## ==> RAN IF ANYONE DIDN'T WIN
+            else:
+                
+                ## ==> UPDATE MESSAGE
+                await interaction.respond(
+                    type = InteractionType.UpdateMessage,
+                    embed=discord.Embed(
+                        title=f"Game between {ctx.author.name} and {p2.name}",
+                        color = discord.Color.from_rgb(46,49,54),
+                        description=f"{_turn.mention}'s turn"
+                    ),
+                    components = board
+                )
+                
+            ## ==> INCREMENT i
+            i += 1
+            
+        ##############################################################################################
+        
+        ## ==> RAN IF THE WHILE LOOP'S CONDITION IS FALSE, IE, WHEN THE GAME IS DRAWED
+        else:
+            
+            ## ==> DISABLE BUTTONS
+            for i in board: 
+                for j in i: j.disabled = True
+                
+            ## ==> ANNOUNCE GAME DRAW
+            await message.edit(
+                embed=discord.Embed(
+                    title="TIC TAC TOE",
+                    color = discord.Color.from_rgb(46,49,54),
+                    description=f"Game Draw!"
+                ),
+                components=board
+            )
+        
+        ##############################################################################################
     
     ## ==> COIN FLIP
     #############################################################################################

@@ -50,13 +50,42 @@ async def reload(ctx,cog):
         if cog.lower() == "all":
             for i in os.listdir("Cogs"):
                 if i.endswith(".py"):
-                    bot.unload_extension(F"Cogs.{i[:-3]}")
-                    bot.load_extension(F"Cogs.{i[:-3]}")
+                    try:
+                        bot.unload_extension(F"Cogs.{i[:-3]}")
+                        bot.load_extension(F"Cogs.{i[:-3]}")
+                    except Exception as e:
+                        await ctx.send(f"<a:aFail:848315264491192320> **Error**\n\n{e}")
         print(f"{'#'*25} Reloaded all Cogs {'#'*25}")
-        await ctx.send("Reloaded all Cogs")
+        await ctx.send("<:success:858125285953110077> Reloaded all Cogs")
     else:
         bot.unload_extension(F"Cogs.{cog}")
         bot.load_extension(F"Cogs.{cog}")
+
+@bot.command
+async def load(ctx: commands.Context, cog) -> None:
+    if ctx.author.id not in [754894159403286531, 510480545160101898]:
+        return
+    if f"{cog}.py" not in os.listdir("Cogs"):
+        await ctx.send("That is not a valid cog")
+    else:
+        try:
+            bot.load_extension(f"Cogs.{cog}")
+        except Exception as e:
+            await ctx.send(f"<a:aFail:848315264491192320> **Error:**\n\n{str(e)}")
+            
+@bot.command
+async def unload(ctx: commands.Context, cog) -> None:
+    if ctx.author.id not in [754894159403286531, 510480545160101898]:
+        return
+    if f"{cog}.py" not in os.listdir("Cogs"):
+        await ctx.send("That is not a valid cog")
+    else:
+        try:
+            bot.unload_extension(f"Cogs.{cog}")
+        except Exception as e:
+            await ctx.send(f"**Error:**\n\n{str(e)}")
+        
+        
 
 # Run the bot
 if __name__ == "__main__":

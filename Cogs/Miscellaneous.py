@@ -22,20 +22,20 @@ class Miscellaneous(commands.Cog):
         elif isinstance(error, commands.MissingRequiredArgument):
             pass
         elif str(ctx.command) == "setWelcomerChannel" and isinstance(error, commands.ChannelNotFound):
-            await ctx.send(embed=discord.Embed(title="Whoops", description=f"That channel doesn't Exist!", color=discord.Color.red()))
+            await ctx.send(embed=discord.Embed(title="Whoops", description=f"<a:aFail:848315264491192320> That channel doesn't Exist!", color=discord.Color.red()))
         elif str(ctx.command) == "setWelcomerChannel" and isinstance(error, commands.ChannelNotReadable):
-            await ctx.send(embed=discord.Embed(title="Whoops", description=f"I cannot read that channel!", color=discord.Color.red()))
+            await ctx.send(embed=discord.Embed(title="Whoops", description=f"<a:aFail:848315264491192320> I cannot read that channel!", color=discord.Color.red()))
         elif isinstance(error, commands.ChannelNotReadable): 
             pass
         elif isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(embed=discord.Embed(title="Whoops", description=f"{str(ctx.command).capitalize()} Command is on Cooldown!", color=discord.Color.red()))
+            await ctx.send(embed=discord.Embed(title="Whoops", description=f"<a:aFail:848315264491192320> {str(ctx.command).capitalize()} Command is on Cooldown!", color=discord.Color.red()))
         elif isinstance(error, commands.MissingPermissions):
-            await ctx.send(embed=discord.Embed(title="Whoops", description="You are missing Permissions to do that!", color=discord.Color.red()))
+            await ctx.send(embed=discord.Embed(title="Whoops", description="<a:aFail:848315264491192320> You are missing Permissions to do that!", color=discord.Color.red()))
         else:
             if str(error).endswith("Missing Permissions"): return
             embed = discord.Embed(
                     title='ERROR',
-                    description=f"Error message:\n**{error}**\n\nCommand: **{ctx.command}**",
+                    description=f"<a:aFail:848315264491192320> Error message:\n**{error}**\n\nCommand: **{ctx.command}**",
                     color=discord.Color.from_rgb(46,49,54)
                 )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
@@ -68,10 +68,22 @@ class Miscellaneous(commands.Cog):
             placeholder="Choose what you want help with!",
             options = [
                 SelectOption(
+                    label="Welcomer",
+                    value="Welcomer",
+                    description="Get help with Welcomer",
+                    emoji="👋"
+                ),
+                SelectOption(
                     label="Moderation",
                     value="Moderation",
                     description="Get help with Moderation",
                     emoji="🧐"
+                ),
+                SelectOption(
+                    label="Logs",
+                    value="Logs",
+                    description="Get help with Logs",
+                    emoji="🔍"
                 ),
                 SelectOption(
                     label="Fun",
@@ -98,12 +110,6 @@ class Miscellaneous(commands.Cog):
                     emoji="😃"
                 ),
                 SelectOption(
-                    label="Configuration",
-                    value="Configuration",
-                    description="Get help with Configuration",
-                    emoji="⚙"
-                ),
-                SelectOption(
                     label="Miscellaneous",
                     value="Miscellaneous",
                     description="Get help with Other Commands",
@@ -116,14 +122,38 @@ class Miscellaneous(commands.Cog):
         
         ## ==> EMBEDS DICTIONARY
         #########################################################################################
-        
+
         embeds = {
+            "Welcomer": discord.Embed(
+                title="WELCOMER",
+                color=discord.Color.from_rgb(46,49,54),
+                description=f"""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+
+• <a:gearSpinning:873882264134643712> `welcomer [configuration] [value]`
+```
+To Configure Welcomer
+
+Examples:
+{self.bot.command_prefix}welcomer welcome-message Hey |user|, Welcome to |guild|^
+{self.bot.command_prefix}welcomer leave-message |user| left |guild|^
+{self.bot.command_prefix}welcomer channel #welcomer
+{self.bot.command_prefix}welcomer enable true
+{self.bot.command_prefix}welcomer enable false
+```
+"""
+            ).set_footer(text="^ \"|user|\" and \"|guild|\" are keywords and are required in these configurations"),
             "Moderation": discord.Embed(
                 title="MODERATION",
                 color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
-    
+
+• :face_with_symbols_over_mouth: `ToggleAutoMod`
+```
+To Toggle AutoMod
+```
+
 • :x: `ban [member] (reason)`
 ```
 To Ban a member
@@ -159,6 +189,23 @@ To clear number amount of messages
 default is 5
 ```
 """
+            ),
+            "Logs": discord.Embed(
+                title="LOGS",
+                color=discord.Color.from_rgb(46,49,54),
+                description=f"""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+
+• <a:gearSpinning:873882264134643712> `logs [configuration] [value]`
+```
+To Configure Logs
+
+Examples:
+{self.bot.command_prefix}logs channel #logs
+{self.bot.command_prefix}logs enable true
+{self.bot.command_prefix}logs enable false
+```
+"""  
             ),
             "Fun": discord.Embed(
                 title="FUN",
@@ -214,11 +261,14 @@ Defaults to the member who ran the command
 ```
 To get the leaderboards of your server
 ```
+
+• :bar_chart: `ToggleLeveling`
+```
+To Toggle Leveling
+```
 """
             ),
-            
-            ## 35, 39, 42
-            
+                        
             "Music": discord.Embed(
                 title="MUSIC",
                 color=discord.Color.from_rgb(46,49,54),
@@ -275,18 +325,6 @@ To send all available emojis
 ```
 """
             ),
-            "Configuration": discord.Embed(
-                title="CONFIGURATION",
-                color=discord.Color.from_rgb(46,49,54),
-                description="""
-**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
-
-• :gear: `config`
-```
-To configure the bot in your server
-```
-"""
-            ),
             "Miscellaneous": discord.Embed(
                 title="MISCELLANEOUS",
                 color=discord.Color.from_rgb(46,49,54),
@@ -317,7 +355,7 @@ Defaults to the person who ran this command
 To get my stats
 ```
 
-• :moneybag: `donate`
+• <:ha:873879461634924614> `donate`
 ```
 Get the patreon link of HackArmour
 ```
@@ -330,7 +368,7 @@ Get the patreon link of HackArmour
         ## ==> SEND MESSAGE
         #########################################################################################
         
-        await ctx.send(
+        msg = await ctx.send(
             embed=discord.Embed(
                 title="HELP",
                 color=discord.Color.from_rgb(46,49,54),
@@ -353,13 +391,18 @@ Get the patreon link of HackArmour
                 )
             except asyncio.TimeoutError:
                 select.disabled = True
+                await msg.edit(components=[select])
                 break
+            except discord.HTTPException:
+                pass
             try:
                 await reaction.respond(
                     type=InteractionType.UpdateMessage,
                     embed = embeds[reaction.component[0].label]
                 )
-            except discord.NotFound: ...
+            except discord.NotFound: pass
+            except discord.HTTPException:
+                pass
             
         #########################################################################################
 
@@ -370,14 +413,47 @@ Get the patreon link of HackArmour
 
     @commands.command()
     async def stats(self,ctx: commands.Context) -> None:
-        pyver = str(sys.version[:6])
         embed = discord.Embed(title="STATS",color=discord.Color.from_rgb(46,49,54),inline=False)
-        embed.add_field(inline=True,name="UPTIME",value=f"```\n{str(datetime.timedelta(seconds=int(round(time() - self.STARTTIME))))}\n```")
-        embed.add_field(inline=True,name="PING",value=f"```\n{round(self.bot.latency * 1000)}ms\n```")
-        embed.add_field(inline=True,name="DISCORD.PY VERSION",value=f"```\n{discord.__version__}\n```")
-        embed.add_field(inline=True,name="PYTHON VERSION",value=f"```\n{pyver}\n```")
-        embed.add_field(inline=True,name="SERVER",value=f"```\n{ctx.guild}\n```")
-        embed.add_field(inline=True,name='TOTAL SERVERS',value=f'```\n{str(len(self.bot.guilds))}\n```')
+        embed.add_field(
+            inline=False,
+            name=":arrow_up: UPTIME",
+            value=f"```\n{str(datetime.timedelta(seconds=int(round(time() - self.STARTTIME))))}\n```"
+        )
+        embed.add_field(
+            inline=False,
+            name=":ping_pong: PING",
+            value=f"```\n{round(self.bot.latency * 1000)}ms\n```"
+        )
+        embed.add_field(
+            inline=False,
+            name="<:Discordlogo:843715679920193596> DISCORD.PY VERSION",
+            value=f"```\n{discord.__version__}\n```"
+        )
+        embed.add_field(
+            inline=False,
+            name="<:pythonlogo:843714646832709673> PYTHON VERSION",
+            value=f"```\n{str(sys.version[:6])}\n```"
+        )
+        embed.add_field(
+            inline=False,
+            name="<:HomeServerLogo:843716672094339073> SERVER",
+            value=f"```\n{ctx.guild}\n```"
+        )
+        embed.add_field(
+            inline=False,
+            name='<:HomeServerLogo:843716672094339073> TOTAL SERVERS',
+            value=f'```\n{str(len(self.bot.guilds))}\n```'
+        )
+        devs = [
+            str(await self.bot.fetch_user(754894159403286531)),
+            str(await self.bot.fetch_user(510480545160101898)),
+            str(await self.bot.fetch_user(628575263818514444))
+        ]
+        embed.add_field(
+            inline=False,
+            name="<:source_code1600:843715185277534238> DEVELOPERS",
+            value="```\n{}\n```".format("\n".join(devs))
+        )
         embed.set_thumbnail(url=ctx.guild.icon_url)
         embed.set_image(url="https://cdn.discordapp.com/attachments/616315208251605005/616319462349602816/Tw.gif")
         await ctx.send(embed = embed, components=[[Button(label="Invite Me", style=ButtonStyle.URL, url="https://discord.com/oauth2/authorize?client_id=845154524997877770&permissions=-9&scope=bot", emoji = '🔗')]])
@@ -415,7 +491,7 @@ Get the patreon link of HackArmour
     async def donate(self,ctx: commands.Context) -> None:
         btn = Button(label="Patreon - Hack Armour", style=ButtonStyle.URL, url = "https://www.patreon.com/hackarmour", id = "embed", emoji = "🔗")
         embed = discord.Embed(title="Support Us",color=discord.Color.from_rgb(46,49,54))
-        embed.add_field(name='Please support the development by becoming a patron!',value="Click the Button below to go our Patreon page.")
+        embed.add_field(name='Please support the development by becoming a patreon!',value="Click the Button below to go our Patreon page.")
         embed.set_image(url="https://cdn.discordapp.com/attachments/616315208251605005/616319462349602816/Tw.gif")
         await ctx.send(components=[[btn]], embed=embed)
 

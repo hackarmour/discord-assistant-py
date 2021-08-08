@@ -1,5 +1,7 @@
 {
     "811828700844654592": {
-        "ModEnabled": true
+        "ModEnabled": false,
+        "channel": 873541807152168970,
+        "toggled": true
     }
 }

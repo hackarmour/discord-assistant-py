@@ -70,6 +70,7 @@ class Moderation(commands.Cog):
                     emb.add_field(name='Edited Message',value=message_after.content)
                     try: await self.bot.get_channel(self.CONFIG[str(message_before.guild.id)]["channel"]).send(embed=emb)
                     except KeyError: pass
+                    except discord.HTTPException: pass
             except KeyError:
                 emb=discord.Embed(title=f'Message Edited in {message_after.channel}',description='',color=discord.Color.red())
                 emb.set_author(name=message_after.author,icon_url=message_after.author.avatar_url)
@@ -94,6 +95,7 @@ class Moderation(commands.Cog):
                     emb.timestamp=message.created_at
                     try: await self.bot.get_channel(self.CONFIG[str(message.guild.id)]["channel"]).send(embed=emb)
                     except KeyError: pass
+                    except discord.HTTPException:pass
             except KeyError:
                 emb=discord.Embed(title='Deleted Message', description=f'Message in {message.channel.mention} sent by {message.author} is deleted.',color=discord.Color.red())
                 emb.set_author(name=message.author,icon_url=message.author.avatar_url)
@@ -109,12 +111,16 @@ class Moderation(commands.Cog):
     
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def togglemod(self, ctx: commands.Context) -> None:
+    async def toggleAutoMod(self, ctx: commands.Context) -> None:
         
         if str(ctx.guild.id) in self.CONFIG.keys():
             self.CONFIG[str(ctx.guild.id)]["ModEnabled"] = True if not self.CONFIG[str(ctx.guild.id)]["ModEnabled"] else False
         else:
-            self.CONFIG[str(ctx.guild.id)] = {"ModEnabled":True}
+            self.CONFIG[str(ctx.guild.id)] = {
+                "ModEnabled":True,
+                "channel": None,
+                "toggled": False
+            }
         self.rewrite()
         enabledordisabled = 'enabled' if self.CONFIG[str(ctx.guild.id)]["ModEnabled"] else 'disabled'
         await ctx.send(
@@ -124,38 +130,125 @@ class Moderation(commands.Cog):
                 color=discord.Color.from_rgb(46,49,54)
             )
         )
-    
+        
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def toggleLog(self, ctx: commands.Context) -> None:
-        if str(ctx.guild.id) in self.CONFIG.keys():
-            self.CONFIG[str(ctx.guild.id)]["toggled"] = True if not self.CONFIG[str(ctx.guild.id)]["toggled"] else False
-        else:
-            self.CONFIG[str(ctx.guild.id)] = {"channel": None, "toggled": True}
-            
-        self.rewrite()
+    async def logs(self, ctx: commands.Context, value: str = None, _: str = None) -> None:
         
-        enabledordisabled = "Enabled" if self.CONFIG[str(ctx.guild.id)]["toggled"] else "Disabled"
-        
-        await ctx.send(
-            embed=discord.Embed(
-                color=discord.Color.from_rgb(46,49,54),
-                title="MODERATION",
-                description=f"Logs Have Been {enabledordisabled}"
+        ## ==> CHECK IF ALL VALUES ARE PASSED
+        if value is None:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="LOGS",
+                    color = discord.Color.from_rgb(46,49,54),
+                    description=f"Please pass all the arguements\n\nYou can use the following arguements:\n```\n{', '.join(['channel', 'enable'])}\n```"
                 )
             )
-    
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def setLogChannel(self,ctx: commands.Context, channel: commands.TextChannelConverter):
-        if channel in ctx.guild.channels:
-            if str(ctx.guild.id) not in self.CONFIG.keys(): self.CONFIG[str(ctx.guild.id)] = {"channel": channel.id, "toggled":False}
-            else: self.CONFIG[str(ctx.guild.id)]["channel"] = channel.id
+        
+        if _ is None: return
+        
+        ## ==> CHECK IF VALUES ARE CORRECT 
+        if value.lower() not in ["channel", "enable"]:
+            await ctx.send(
+                embed = discord.Embed(
+                    title="LOGS",
+                    color = discord.Color.from_rgb(46,49,54),
+                    description=f"Please pass correct arguements\n\nYou can use the following arguements:\n```\n{', '.join(['channel', 'enable'])}\n```"
+                )
+            )
+            return
+
+        ## ==> CHANNEL
+        #########################################################################################
+        
+        elif value.lower() == "channel":
             
-            self.rewrite()
-            embed = discord.Embed(title="MODERATION",description=f"Logs set to <#{channel.id}> !", color=discord.Color.from_rgb(46,49,54))
-            await ctx.send(embed=embed)
-        else: return
+            ## ==> CHANGE _ TO discord.TextChannel OBJECT
+            try: channel = await commands.TextChannelConverter().convert(ctx, _)
+            except commands.CommandError: return
+            
+            ## ==> CHECK IF THE CHANNEL IS READABLE OR NOT            
+            try:
+                msg = await channel.send("""
+**This is a test**
+
+This is done to check if this channel is *readable* or not!
+You can delete this message if you want!
+            """)
+            except discord.Forbidden:
+                await ctx.send("I am having problems reading that channel :face_with_spiral_eyes:")
+                return
+            
+            ## ==> DELETE THE MESSAGE
+            await msg.delete()
+            
+            ## ==> CHECK IF GUILD ID IS NOT IN CONFIG
+            if str(ctx.guild.id) not in self.CONFIG.keys(): 
+                
+                ## ==> CREATE VALUES
+                self.CONFIG[str(ctx.guild.id)] = {
+                    "ModEnabled": False,
+                    "channel": channel.id,
+                    "toggled":False
+                }
+            ## ==> GUILD ID IS IN CONFIG
+            else:
+                ## ==> CHANGE channel KEY
+                self.CONFIG[str(ctx.guild.id)]["channel"] = channel.id
+        
+            await ctx.send(
+                embed=discord.Embed(
+                    title="LOGS",
+                    color = discord.Color.from_rgb(46,49,54),
+                    description=f":white_check_mark: Logs channel is now changed to {channel.mention}"
+                )
+            )
+        #########################################################################################
+        
+        ## ==> ENABLE
+        #########################################################################################
+        
+        elif value.lower() == "enable":
+            
+            ## ==> CHECK IF VALUES ARE CORRECT
+            if _.lower() not in ["true", "false"]:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title="LOGS",
+                        description="Please pass correct arguements for `enable`\n\nUse either `true` or `false`",
+                        color=discord.Color.from_rgb(46,49,54)
+                    )
+                )
+                return
+            
+            ## ==> CHANGE _ TO BOOLEAN
+            _ = True if _.lower() == "true" else False
+            
+            ## ==> IF GUILD ID IS IN CONFIG
+            if str(ctx.guild.id) in self.CONFIG.keys():
+
+                ## ==> CHANGE TOGGLED KEY
+                self.CONFIG[str(ctx.guild.id)]["toggled"] = _
+                
+            ## ==> IF GUILD ID ISN'T IN CONFIG
+            else:
+                self.CONFIG[str(ctx.guild.id)] = {
+                    "ModEnabled": False,
+                    "channel": None,
+                    "toggled": _
+                }
+                
+            await ctx.send(
+                embed=discord.Embed(
+                    title="LOGS",
+                    color=discord.Color.from_rgb(46,49,54),
+                    description=f"{':white_check_mark:' if _ else ':x:'} Logs have been {'Enabled' if _ else 'Disabled'}"
+                )
+            )
+                
+        #########################################################################################
+        
+        self.rewrite()
         
     #############################################################################################
 
