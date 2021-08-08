@@ -1,1 +1,8 @@
-{}
+{
+    "811828700844654592": {
+        "active": false,
+        "welcome_message": "hey |user| welcome to |guild|",
+        "leave_message": "|user| left",
+        "channel": 856169877882273806
+    }
+}

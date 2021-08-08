@@ -1,12 +1,11 @@
 ## ==> IMPORTS
 #############################################################################################
 
-import discord, os
+import discord, os, json
 import pandas as pd
 import numpy as np
 from discord.ext import commands
-from discord.ext.commands.cooldowns import BucketType
-from random import randint
+from random import randint, choice
 from disrank.generator import Generator
 
 #############################################################################################
@@ -14,6 +13,8 @@ from disrank.generator import Generator
 class LevelingPD(commands.Cog):
     def __init__(self, bot:commands.Bot):
         self.bot = bot
+        with open("Configuration/Leveling.json") as f:
+            self.CONFIG = json.load(f)
         
             
     def position(self, userid, guildid):
@@ -41,6 +42,14 @@ class LevelingPD(commands.Cog):
         
         if message.author.bot: return
         if message.author.guild is None: return
+                
+        if str(message.guild.id) in self.CONFIG.keys():
+            if self.CONFIG[str(message.guild.id)]:
+                return
+                
+        if not choice([True, True, True, False, False, False, False, False, False, False]):
+            return
+        
                 
         ## ==> CHOOSE A RANDOM VALUE FOR XP        
         _randNo = randint(5,15)
@@ -174,7 +183,10 @@ class LevelingPD(commands.Cog):
         file = discord.File(fp=image, filename=f'image.png')
         await ctx.send(file=file)
         del args, image, file, rank
-        
+    
+    ## ==> LEADERBOARD
+    #########################################################################################
+    
     @commands.command(aliases=['lb'])
     async def leaderboard(self, ctx: commands.Context) -> None:
         
@@ -196,7 +208,40 @@ class LevelingPD(commands.Cog):
             
             
         lb = "\n\n".join([f"{index+1}.  {self.bot.get_user(int(item))}" for index, item in enumerate(_)])
-        await ctx.send(embed=discord.Embed(title="LEADERBOARD", color=ctx.author.color, description=f"```\n{lb}\n```"))
+        await ctx.send(
+            embed=discord.Embed(
+                title="LEADERBOARD",
+                color=discord.Color.from_rgb(46,49,54),
+                description=f"```\n{lb}\n```"
+            )
+        )
+
+    #########################################################################################
+    
+    ## ==> TOGGLE LEVELING
+    #########################################################################################
+    
+    @commands.command()
+    async def ToggleLeveling(self, ctx: commands.Context) -> None:
+        if str(ctx.author.guild.id) in self.CONFIG.keys():
+            self.CONFIG[str(ctx.author.guild.id)] = True if not self.CONFIG[str(ctx.author.guild.id)] else False
+        else:
+            self.CONFIG[str(ctx.author.guild.id)] = True
+            
+        with open("Configuration/Leveling.json", 'w') as f:
+            json.dump(self.CONFIG, f, indent=4)
+    
+        enabledordisabled = "Disabled" if self.CONFIG[str(ctx.author.guild.id)] else "Enabled"
+    
+        await ctx.send(
+            embed=discord.Embed(
+                title="LEVELING",
+                description=f"Leveling has been {enabledordisabled}",
+                color = discord.Color.from_rgb(46,49,54)
+            )
+        )
+    
+    #########################################################################################
 
 def setup(bot:commands.Bot):
     bot.add_cog(LevelingPD(bot))
