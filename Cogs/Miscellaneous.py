@@ -115,6 +115,12 @@ class Miscellaneous(commands.Cog):
                     description="Get help with Other Commands",
                     emoji="⚪"
                 ),
+                SelectOption(
+                    label="Economy",
+                    value="Economy",
+                    description="Get help with Economy Commands",
+                    emoji="💰"
+                )
             ]
         )
         
@@ -360,6 +366,79 @@ To get my stats
 Get the patreon link of HackArmour
 ```
 """
+            ),
+            "Economy":discord.Embed(
+                title="Economy",
+                color=discord.Color.from_rgb(46,49,54),
+                description="""
+**Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
+:money_with_wings: `earn` 
+```Which gives you random amount of coins
+```
+
+:coin: `bal (user)`  
+```
+To check balance, you can mention a user to check balance to check their balance
+
+```
+:shopping_bags: `inv`  
+```
+To check your inventory, you can mention a user to check their inventory
+```
+
+:money_with_wings: `bankrob [user]`  
+```
+To rob the mentioned user's bank account
+```
+:shopping_bags: `shop`  
+```
+To get list of items available in shop
+```
+
+:shopping_bags: `buy (item)`
+``` 
+To buy that item. If no item is specified then bot will prompt you to add ItemId to buy that item
+```
+
+:moneybag: `daily`
+``` 
+To claim your daily bonus. You can also get a lucky box if you're lucky enough
+```
+
+:coin: `give [user] [coins]`
+```
+To give coins to a user
+```
+
+:money_with_wings: `rob [user]`
+```
+To rob coins from user's Wallet.
+```
+
+:bank: `dep [coins]` 
+```To deposit given number of coins into your bank account. You can also specify all to deposit all coins
+```
+
+:shopping_bags: `.use [item name]`  
+```
+To use the item
+```
+
+:coin: `wd [coins]`
+```
+To withdraw given number of coins from bank account. You can also specify coins as all to withdraw all coins
+```
+
+:coin: `sell [itemname]` 
+```
+To sell that item
+```
+
+:eyes: `search`
+```
+To search different place
+```           
+                """
             )
         }
         

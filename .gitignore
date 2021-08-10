@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+Cogs/__pycache__
+Configuration/Balance.db
 
 # C extensions
 *.so

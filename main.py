@@ -21,6 +21,42 @@ import discord, json, os
 from discord.ext import commands
 from time import time
 from discord_components import DiscordComponents
+import sqlite3
+conn=sqlite3.connect('Configuration/Balance.db')
+c= conn.cursor()
+### => Creating three tables
+try:
+    c.execute(f"""CREATE TABLE Inventory(
+            itemName text,
+            quantity integer,
+            userid integer,
+            itemId blob
+        )""")
+    conn.commit()
+except sqlite3.OperationalError as e:
+    pass
+try:
+    c.execute(f"""CREATE TABLE shop(
+            itemName text,
+            cP integer,
+            description blob,
+            itemId blob,
+            category text,
+            sP integer
+        )""")
+    conn.commit()
+except sqlite3.OperationalError as e:
+    pass
+try:
+    c.execute("""CREATE TABLE userdata(
+            userid integer,
+            walletAmt integer,
+            bankAmt integer,
+            guildid integer
+        )""")
+    conn.commit()
+except sqlite3.OperationalError as e:
+    pass
 
 # Read the token
 TOKEN = input("Enter The Token of your bot: ")
@@ -36,6 +72,7 @@ for i in os.listdir("Cogs"):
 @bot.event
 async def on_ready():
     DiscordComponents(bot)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching , name="Made by Hack Armour team"))
     print("The Bot is Ready")
     with open("Configuration/config.json") as f:
         config = json.loads(f.read())
