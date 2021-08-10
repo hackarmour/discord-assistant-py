@@ -372,69 +372,69 @@ Get the patreon link of HackArmour
                 color=discord.Color.from_rgb(46,49,54),
                 description="""
 **Arguements surrounded by `()` are optional whereas arguements surrounded by `[]` are necessary!**
-:money_with_wings: `earn` 
+• :money_with_wings: `earn` 
 ```Which gives you random amount of coins
 ```
 
-:coin: `bal (user)`  
+• :coin: `bal (user)`  
 ```
 To check balance, you can mention a user to check balance to check their balance
 
 ```
-:shopping_bags: `inv`  
+• :shopping_bags: `inv`  
 ```
 To check your inventory, you can mention a user to check their inventory
 ```
 
-:money_with_wings: `bankrob [user]`  
+• :money_with_wings: `bankrob [user]`  
 ```
 To rob the mentioned user's bank account
 ```
-:shopping_bags: `shop`  
+• :shopping_bags: `shop`  
 ```
 To get list of items available in shop
 ```
 
-:shopping_bags: `buy (item)`
+• :shopping_bags: `buy (item)`
 ``` 
 To buy that item. If no item is specified then bot will prompt you to add ItemId to buy that item
 ```
 
-:moneybag: `daily`
+• :moneybag: `daily`
 ``` 
 To claim your daily bonus. You can also get a lucky box if you're lucky enough
 ```
 
-:coin: `give [user] [coins]`
+• :coin: `give [user] [coins]`
 ```
 To give coins to a user
 ```
 
-:money_with_wings: `rob [user]`
+• :money_with_wings: `rob [user]`
 ```
 To rob coins from user's Wallet.
 ```
 
-:bank: `dep [coins]` 
+• :bank: `dep [coins]` 
 ```To deposit given number of coins into your bank account. You can also specify all to deposit all coins
 ```
 
-:shopping_bags: `.use [item name]`  
+• :shopping_bags: `.use [item name]`  
 ```
 To use the item
 ```
 
-:coin: `wd [coins]`
+• :coin: `wd [coins]`
 ```
 To withdraw given number of coins from bank account. You can also specify coins as all to withdraw all coins
 ```
 
-:coin: `sell [itemname]` 
+• :coin: `sell [itemname]` 
 ```
 To sell that item
 ```
 
-:eyes: `search`
+• :eyes: `search`
 ```
 To search different place
 ```           
