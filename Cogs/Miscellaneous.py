@@ -39,7 +39,7 @@ class Miscellaneous(commands.Cog):
                     color=discord.Color.from_rgb(46,49,54)
                 )
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
-            await self.bot.get_channel(872818862742204487).send(embed=embed)
+            await self.bot.get_channel(877408123344789515).send(embed=embed)
             
     ##############################################################################################
 
@@ -386,9 +386,15 @@ Get the patreon link of HackArmour
             try:
                 reaction = await self.bot.wait_for(
                     "select_option",
-                    timeout=60.0,
-                    check=lambda i: i.user == ctx.author
+                    timeout=60.0
                 )
+                if(reaction.author!=ctx.author):
+                    await reaction.respond(
+                        type=4,
+                        content="This menu is not for you",
+                        empherel=True
+                    )
+                    continue
             except asyncio.TimeoutError:
                 select.disabled = True
                 await msg.edit(components=[select])

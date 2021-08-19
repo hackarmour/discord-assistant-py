@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+Leveling.csv
 # C extensions
 *.so
 .vscode
@@ -127,3 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+Cogs/__pycache__
