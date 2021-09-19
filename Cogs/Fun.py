@@ -1,4 +1,4 @@
-import discord, requests, asyncio
+import discord, requests, asyncio, json
 from discord.ext import commands
 from random import choice
 from discord_components import Button, ButtonStyle, InteractionType
@@ -8,25 +8,33 @@ class Fun(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         
+        ## ==> READ VALUES
+        with open("Configuration/config.json") as f:
+            cfg = json.load(f)
+            self.fail_emoji = cfg["fail_emoji"]
+            self.success_emoji = cfg["success_emoji"]
+            embed_color = cfg["embed_color"]
+            self.r = embed_color[0]
+            self.g = embed_color[1]
+            self.b = embed_color[2]
+            
+            
         self.EIGHT_BALL_ANSWERS = [
             "Yeah", "Yes", "Ofcourse", "Ofc", "Ah Yes", "I see in the Prophecy: TRUE!"
             "Nah", "No", 'Nope', 'Never', "I don't think so",
             "idk", "Maybe", "ig", "I'm bored", "You're annoying"
         ]
         
-        self._board_template = [
-            ":white_large_square:",":white_large_square:",":white_large_square:\n",
-            ":white_large_square:",":white_large_square:",":white_large_square:\n",
-            ":white_large_square:",":white_large_square:",":white_large_square:"
-        ]
-        self._emoji_template = ['↖', '⬆', '↗', '⬅', '⏹', '➡', '↙', '⬇', '↘']
-        self.data = {}
     
     
     ## ==> ROCK PAPER SCISSORS
     #############################################################################################
     
-    @commands.command()
+    @commands.command(
+        help="""
+` `- **To Play Rock Paper Scissors With <p2>**
+"""
+    )
     @commands.guild_only()
     async def rps(self, ctx: commands.Context, p2: commands.MemberConverter) -> None:
         
@@ -35,10 +43,10 @@ class Fun(commands.Cog):
         
         if ctx.author.bot: return
         if p2.bot: 
-            await ctx.send("You can't play against a bot!")
+            await ctx.send(f"{self.fail_emoji} You can't play against a bot!")
             return
         if ctx.author.id == p2.id:
-            await ctx.send("You can't invite yourself!")
+            await ctx.send(f"{self.fail_emoji} You can't invite yourself!")
             return
         
         #############################################################################################
@@ -66,7 +74,7 @@ class Fun(commands.Cog):
         embed = discord.Embed(
                 title="ROCK PAPER SCISSORS",
                 description=f"{ctx.author.mention} - Blue\n{p2.mention} - Red",
-                color=discord.Color.from_rgb(46,49,54)
+                color=discord.Color.from_rgb(self.r, self.g, self.b)
         )
         
         ## ==> SEND MESSAGE
@@ -119,7 +127,7 @@ class Fun(commands.Cog):
                     embed=discord.Embed(
                         title="ROCK PAPER SCISSORS",
                         description=desc,
-                        color=discord.Color.from_rgb(46,49,54)
+                        color=discord.Color.from_rgb(self.r, self.g, self.b)
                     ),
                     components=[p1Buttons, p2Buttons]
                 )
@@ -147,7 +155,7 @@ class Fun(commands.Cog):
                     embed=discord.Embed(
                         title="ROCK PAPER SCISSORS",
                         description=desc,
-                        color=discord.Color.from_rgb(46,49,54)
+                        color=discord.Color.from_rgb(self.r, self.g, self.b)
                     ),
                     components=[p1Buttons, p2Buttons]
                 )
@@ -167,6 +175,7 @@ class Fun(commands.Cog):
         
         ## ==> P1
         #############################################################################################
+        
         if (p1choice.lower(), p2choice.lower()) in [
             ("paper", "rock"),
             ("rock", "scissors"),
@@ -182,7 +191,7 @@ class Fun(commands.Cog):
 
 **{ctx.author.mention} has won!**
 """,
-                    color=discord.Color.from_rgb(46,49,54)
+                    color=discord.Color.from_rgb(self.r, self.g, self.b)
                 ),
                 components=[]
             )
@@ -203,7 +212,7 @@ class Fun(commands.Cog):
 
 **{p2.mention} has won!**
 """,
-                    color=discord.Color.from_rgb(46,49,54)
+                    color=discord.Color.from_rgb(self.r, self.g, self.b)
                 ),
                 components=[]
             )
@@ -229,14 +238,18 @@ class Fun(commands.Cog):
     ## ==> TIC TAC TOE
     #############################################################################################
     
-    @commands.command()
+    @commands.command(
+        help="""
+` `- **To Play Tic Tac Toe With <p2>**
+"""
+    )
     async def ttt(self, ctx: commands.Context, p2: commands.MemberConverter) -> None:
         if ctx.author.bot: return
         if p2.bot: 
-            await ctx.send("You can't play against a bot!")
+            await ctx.send(f"{self.fail_emoji} You can't play against a bot!")
             return
         if ctx.author == p2:
-            await ctx.send("You can't invite yourself!")
+            await ctx.send(f"{self.fail_emoji} You can't invite yourself!")
             return
         
         
@@ -248,7 +261,7 @@ class Fun(commands.Cog):
         embed = discord.Embed(
             title="TIC TAC TOE",
             description=f"{p2.mention},{ctx.author.mention} invites you to a game of Tic Tac Toe!",
-            color=discord.Color.from_rgb(46,49,54)
+            color=discord.Color.from_rgb(self.r, self.g, self.b)
         )
         message = await ctx.send(
             embed=embed,
@@ -262,8 +275,8 @@ class Fun(commands.Cog):
             await message.edit(
                 embed=discord.Embed(
                     title="TIC TAC TOE",
-                    description=f"Oh no! {p2.name} didn't click any button on time",
-                    color=discord.Color.from_rgb(46,49,54)
+                    description=f"{self.fail_emoji} Oh no! {p2.name} didn't click any button on time",
+                    color=discord.Color.from_rgb(self.r, self.g, self.b)
                     ),
                 components=[]
             )
@@ -276,7 +289,7 @@ class Fun(commands.Cog):
                 embed=discord.Embed(
                     title=f"Game between {ctx.author.name} and {p2.name}",
                     description="Get ready to play!",
-                    color=discord.Color.from_rgb(46,49,54)
+                    color=discord.Color.from_rgb(self.r, self.g, self.b)
                 ),
                 components = []
             )
@@ -289,7 +302,7 @@ class Fun(commands.Cog):
                 embed=discord.Embed(
                     title=f"Game between {ctx.author.name} and {p2.name}",
                     description="Match Declined",
-                    color=discord.Color.from_rgb(46,49,54)
+                    color=discord.Color.from_rgb(self.r, self.g, self.b)
                 ),
                 components = []
             )
@@ -312,7 +325,7 @@ class Fun(commands.Cog):
         await message.edit(
             embed=discord.Embed(
                 title="TIC TAC TOE",
-                color=discord.Color.from_rgb(46,49,54),
+                color=discord.Color.from_rgb(self.r, self.g, self.b),
                 description=f"{_turn.mention}'s turn"
             ),
             components=board
@@ -320,6 +333,7 @@ class Fun(commands.Cog):
         
         ## ==> MAIN LOOP
         ##############################################################################################
+        
         while i < 9:
             
             ## ==> GET INTERACTION
@@ -342,7 +356,7 @@ class Fun(commands.Cog):
                 await message.edit(
                     embed=discord.Embed(
                         title="TIC TAC TOE",
-                        color=discord.Color.from_rgb(46,49,54),
+                        color=discord.Color.from_rgb(self.r, self.g, self.b),
                         description=f"{oppositeTurn} has **won** the game since {_turn.mention} didn't click on any buttons in time!"
                     ),
                     components=board
@@ -426,7 +440,7 @@ class Fun(commands.Cog):
                     type=InteractionType.UpdateMessage,
                     embed=discord.Embed(
                         title="TIC TAC TOE",
-                        color = discord.Color.from_rgb(46,49,54),
+                        color = discord.Color.from_rgb(self.r, self.g, self.b),
                         description=f"{p2.mention if _turn == ctx.author else ctx.author.mention} **has won!**"
                     ),
                     components=board
@@ -441,7 +455,7 @@ class Fun(commands.Cog):
                     type = InteractionType.UpdateMessage,
                     embed=discord.Embed(
                         title=f"Game between {ctx.author.name} and {p2.name}",
-                        color = discord.Color.from_rgb(46,49,54),
+                        color = discord.Color.from_rgb(self.r, self.g, self.b),
                         description=f"{_turn.mention}'s turn"
                     ),
                     components = board
@@ -463,7 +477,7 @@ class Fun(commands.Cog):
             await message.edit(
                 embed=discord.Embed(
                     title="TIC TAC TOE",
-                    color = discord.Color.from_rgb(46,49,54),
+                    color = discord.Color.from_rgb(self.r, self.g, self.b),
                     description=f"Game Draw!"
                 ),
                 components=board
@@ -474,13 +488,17 @@ class Fun(commands.Cog):
     ## ==> COIN FLIP
     #############################################################################################
     
-    @commands.command()
+    @commands.command(
+        help="""
+` `- **To Flip a Coin**
+"""
+    )
     async def coin(self, ctx: commands.Context) -> None:
         await ctx.send(
             embed=discord.Embed(
                 title="COIN FLIP",
                 description=f"Coin has been Tossed: {choice(['Heads', 'Tails'])}",
-                color=discord.Color.from_rgb(46,49,54)
+                color=discord.Color.from_rgb(self.r, self.g, self.b)
             )
         )
 
@@ -489,14 +507,18 @@ class Fun(commands.Cog):
     ## ==> press f to pay respect
     #############################################################################################
     
-    @commands.command()
+    @commands.command(
+        help="""
+` `- **To Press :regional_indicator_f: to Pay respect**
+"""
+    )
     async def f(self, ctx: commands.Context, *, reason: str = None) -> None:
         if reason is not None:
             if any(k in reason for k in ["https://", "http://", "discord.com", "discord.gg"]):
-                await ctx.send("That reason contains a website D:")
+                await ctx.send(f"{self.fail_emoji} That reason contains a website")
                 return
             elif reason.__contains__("<@"):
-                await ctx.send("There are pings in the reason")
+                await ctx.send(f"{self.fail_emoji} There are pings in the reason")
                 return
             else:
                 await ctx.send(
@@ -510,10 +532,18 @@ class Fun(commands.Cog):
     ## ==> 8BALL
     #############################################################################################
 
-    @commands.command(aliases=['8ball'])
+    @commands.command(
+        aliases=['8ball'],
+        help="""
+` `- **8Ball**
+
+` `- **Aliases**:
+`   `8ball
+"""
+    )
     async def eightBall(self, ctx: commands.Context, *, question) -> None:
         embed = discord.Embed(
-            color=discord.Color.from_rgb(46,49,54),
+            color=discord.Color.from_rgb(self.r, self.g, self.b),
             title="8BALL",
             description=f"Question - {question}?\nAnswer - {choice(self.EIGHT_BALL_ANSWERS)}"
         )
@@ -525,17 +555,21 @@ class Fun(commands.Cog):
     ## ==> MEMES
     #############################################################################################
 
-    @commands.command()
+    @commands.command(
+        help="""
+` `- **To get a meme**
+"""
+    )
     async def meme(self,ctx: commands.Context) -> None:
         while True:
             r = requests.get("https://memes.blademaker.tv/api?lang=en")
             res = r.json()
             if res["nsfw"]:
                 continue
-            embed_ = discord.Embed(title=res['title'],color=discord.Color.from_rgb(46,49,54))
+            embed_ = discord.Embed(title=res['title'],color=discord.Color.from_rgb(self.r, self.g, self.b))
             embed_.set_image(url = res["image"])
             embed_.set_author(name = ctx.author,icon_url = ctx.author.avatar_url)
-            embed_.set_footer(text=f"👍 {res['ups']} **|** 👎 {res['downs']}")
+            embed_.set_footer(text=f"👍 {res['ups']}")
             await ctx.send(embed = embed_)
             break
 
