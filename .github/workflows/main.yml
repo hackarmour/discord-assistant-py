@@ -11,4 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: cclauss/Find-Python-syntax-errors-action@master
+        with: 
+            python-version: '3.9'
 
