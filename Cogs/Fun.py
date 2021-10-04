@@ -244,6 +244,7 @@ class Fun(commands.Cog):
 """
     )
     async def ttt(self, ctx: commands.Context, p2: commands.MemberConverter) -> None:
+        
         if ctx.author.bot: return
         if p2.bot: 
             await ctx.send(f"{self.fail_emoji} You can't play against a bot!")
@@ -333,7 +334,7 @@ class Fun(commands.Cog):
         
         ## ==> MAIN LOOP
         ##############################################################################################
-        
+        xyz = 0
         while i < 9:
             
             ## ==> GET INTERACTION
@@ -366,7 +367,7 @@ class Fun(commands.Cog):
             
             
             ## ==> CHECK IF THE BUTTON PRESSED IS OCCUPIED
-            if interaction.component.id == "occupied":
+            if str(interaction.component.id).startswith("occupied"):
                 await interaction.respond(
                     InteractionType = InteractionType.ChannelMessageWithSource,
                     content="That Place is occupied"
@@ -385,7 +386,8 @@ class Fun(commands.Cog):
             
             ## ==> CHANGE THE MARK AND ID
             board[indexes[0]][indexes[1]].style = ButtonStyle.red if _turn == ctx.author else ButtonStyle.blue
-            board[indexes[0]][indexes[1]].id = "occupied"
+            board[indexes[0]][indexes[1]].id = f"occupied{xyz}"
+            xyz += 1
             
             ## ==> CHANGE TURN
             _turn = ctx.author if _turn == p2 else p2
