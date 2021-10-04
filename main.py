@@ -16,7 +16,7 @@
 
 # =============================================================================================
 
-import discord, json, os, traceback, sqlite3
+import discord, json, os, traceback
 from discord.ext import commands
 from time import time
 from discord_components import DiscordComponents
