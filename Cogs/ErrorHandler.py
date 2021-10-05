@@ -77,7 +77,7 @@ class ErrorHandler(commands.Cog):
             ## ==> CHANGE AUTHOR
             embed.set_author(name=str(ctx.author), icon_url=ctx.author.avatar_url)
             
-            await self.bot.get_channel(872818862742204487).send(embed=embed)
+            await self.bot.get_channel(877408123344789515).send(embed=embed)
         
     ###############################################################################################
         

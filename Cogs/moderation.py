@@ -81,7 +81,7 @@ class Moderation(commands.Cog):
                     try: await message.author.remove_roles(role)
                     except Exception: pass
 
-        elif f"<@!{self.bot.user.id}>" in message.content:
+        elif f"<@!{self.bot.user.id}>" in message.content and not message.content.startswith(self.bot.command_prefix):
             try:
                 await message.channel.send(
                     embed=discord.Embed(
