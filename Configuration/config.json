@@ -1,1 +1,11 @@
-{"starttime": 1628414669.4830558}
+{
+    "starttime": 1633534454.8704414,
+    "fail_emoji": "<a:aFail:848315264491192320>",
+    "success_emoji": ":white_check_mark:",
+    "embed_color": [
+        46,
+        49,
+        54
+    ],
+    "stonks_emoji": "<:stonks:874302521680740432>"
+}

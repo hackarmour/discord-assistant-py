@@ -1,12 +1,30 @@
-import discord, asyncio
+import discord, asyncio, json
 from discord.ext import commands
 
 
 class Embeds(commands.Cog):
-    def __init__(self, bot:commands.Bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+        
+        ## ==> READ VALUES
+        with open("Configuration/config.json") as f:
+            cfg = json.load(f)
+            self.fail_emoji = cfg["fail_emoji"]
+            self.success_emoji = cfg["success_emoji"]
+            embed_color = cfg["embed_color"]
+            self.r = embed_color[0]
+            self.g = embed_color[1]
+            self.b = embed_color[2]
 
-    @commands.command()
+    @commands.command(
+        help="""
+` `- **To send Custom Embed to <text_channel>**
+` `- You will be prompted for values
+` `
+` `- **Requires Administrator Permission**
+"""
+    )
+    @commands.has_permissions(administrator=True)
     async def Embed(self, ctx: commands.Context, text_channel: commands.TextChannelConverter) -> None:
         
         ## ==> TITLE OF THE EMBED
@@ -134,12 +152,12 @@ class Embeds(commands.Cog):
             embed = discord.Embed(
                 title=title,
                 description=description,
-                color=discord.Color.from_rgb(46,49,54)
+                color=discord.Color.from_rgb(self.r, self.g, self.b)
             )
         else:
             embed=discord.Embed(
                 title=title,
-                color=discord.Color.from_rgb(46,49,54)
+                color=discord.Color.from_rgb(self.r, self.g, self.b)
             )
         if footer is not None:
             embed.set_footer(text=footer)

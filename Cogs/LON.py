@@ -1,68 +1,108 @@
-import asyncio
-import discord
-from discord import Webhook, AsyncWebhookAdapter
+import discord, asyncio, json
 from discord.ext import commands
 from discord.ext.commands.cooldowns import BucketType
-import json
 from dpymenus import PaginatedMenu, Page
-import aiohttp
+
+
 class LON(commands.Cog):
     def __init__(self,bot):
         self.bot=bot
+        
+        ## ==> READ VALUES
+        with open("Configuration/config.json") as f:
+            cfg = json.load(f)
+            self.fail_emoji = cfg["fail_emoji"]
+            self.success_emoji = cfg["success_emoji"]
+            embed_color = cfg["embed_color"]
+            self.r = embed_color[0]
+            self.g = embed_color[1]
+            self.b = embed_color[2]
 
-    @commands.command()
-    @commands.cooldown(1,60,BucketType.user)  #A cooldown so that this command can be used by individual once in minute to prevent spam.
-    async def lon(self,ctx,emoji):
-        if ctx.author.nick!=None: # checking if author has a nick name if yes, the webhook will use his/her nickname else username
-            name=ctx.author.nick
-        else:
-            name=ctx.author.name
-        with open('Configuration/emojis.json') as f: # opening emojis.json to check for emojis
-            allEmojis=json.load(f) # loadig all the emojis
-            emojiNames=list(allEmojis.keys()) # extracting all the custom names given to emojis
-        if emoji.lower() not in emojiNames: # checking if emojiname exists in json file if it doesn't send the message and stop execution of command.
-            await ctx.send("This emoji does not exist")
-            return
-        await ctx.message.delete()
-        emoji=allEmojis[emoji.lower()] # getting emoji from json file
-        allwebhooks=await ctx.channel.webhooks()  # getting all the webhooks of channel
-        data=[]  # an empty list to add emoji's id
-        for webhook in allwebhooks: # iterating through all the webhooks and adding webhook id in list
-            data.append(webhook.id)
-        with open('Configuration/webhooks.json') as f: # opening webhooks.json file to fetch webhook previously created by bot
-            webhookdata=json.load(f)
-        if str(ctx.channel.id) in list(webhookdata.keys()): # Checking if bot previously created a webhook 
-            for webId in data: # Going through all the webhooks id's present in list
-                if str(webId) in webhookdata[str(ctx.channel.id)]: # checking if the webhook previously created by bot still exists. then sending the emoji using webhook
-                    async with aiohttp.ClientSession() as session:
-                        webhook = Webhook.from_url(webhookdata[str(ctx.channel.id)], adapter=AsyncWebhookAdapter(session))
-                        await webhook.send(emoji, username=name,avatar_url=ctx.author.avatar_url)
-                        return
-        """If there is no webhook previously created by bot then creating a new webhook with the name assistant"""
-        newWebhook=await ctx.channel.create_webhook(name="Assistant")
-        webhookdata[str(ctx.channel.id)]=f"https://discord.com/api/webhooks/{newWebhook.id}/{newWebhook.token}" # making a complete url of new webhook
-        with open('Configuration/webhooks.json','w') as f: # saving this url in json file for after use
-            json.dump(webhookdata,f,indent=4)
-        with open('Configuration/webhooks.json') as f: # opening json file again to get the url and send the webhook
-            allWebhooks=json.load(f)
-        async with aiohttp.ClientSession() as session:
-                    webhook = Webhook.from_url(allWebhooks[str(ctx.channel.id)], adapter=AsyncWebhookAdapter(session))
-                    await webhook.send(emoji, username=name,avatar_url=ctx.author.avatar_url)
+    @commands.command(
+        help="""
+` `- **Sends a webhook with the Emoji passed in the command**
+"""
+    )
+    @commands.cooldown(1,60,BucketType.user)  
+    async def lon(self, ctx: commands.Context, emojiName: str) -> None:
+        
+        ## ==> LOADING CONFIG
+        with open('Configuration/emojis.json') as f:  
+            allEmojis=json.load(f)  
+            allJsonKeys=list(allEmojis.keys())
+    
+        ## ==> IF EMOJI EXISTS IN FILE
+        if emojiName in allJsonKeys:
+            
+            ## ==> GET EMOJI
+            emoji = allEmojis[emojiName]
+            
+            ## ==> DELETE MESSAGE
+            await ctx.message.delete()
+            
+            ## ==> CREATE WEBHOOK
+            webhook = await ctx.channel.create_webhook(name='Assistant')
+            
+            ## ==> CONFIGURE WEBHOOK
+            if (ctx.author.nick==None):
+                name = ctx.author.name
+            else:
+                name = ctx.author.nick
+                
+            ## ==> SEND WEBHOOK
+            await webhook.send(emoji,username=name,avatar_url=ctx.author.avatar_url)
+            await asyncio.sleep(20.0)
+            
+            ## Timer of 20 seconds so that the webhook can be removed after 20 seconds for 2 reasons.
+            ## 1. Not to exceed the limit of 10 webhooks per channel.
+            ## 2. To prevent rate limit as immediate deletion can use bot to be rate limited by the discord to prevent spam.
+            
+            ## ==> DELETING THE WEBHOOK
+            await webhook.delete()
+            
+            
+        elif (emojiName not in allJsonKeys):
+            await ctx.send(F" {self.fail_emoji}Sorry, this emoji doesn't exist.")
 
-    @commands.command()
+
+    @commands.command(
+        help="""
+` `- **To get all the emojis available**
+"""
+    )
     async def lonall(self,ctx):
-        with open('Configuration/emojis.json') as f: #Opening Json file
-            allEmojis=json.load(f)  #Extracting all the data from json file.
-            allEmojis=list(allEmojis.keys())  #Extracting all the keys from json file.
-            nl='\n'  #Declaring a newline character as new line/escape sequence characters are not allowed in curly braces of f string.
-        menu=PaginatedMenu(ctx)  #Setting a menu with reactions to move back and forth between different embeds.
+        
+        ## ==> OPEN CONFIGURATION
+        with open('Configuration/emojis.json') as f: 
+            allEmojis = json.load(f)
+            allEmojis = list(allEmojis.keys())
+            nl='\n'
 
-        # Creating three pages for the menu
-        emb1=Page(title='Emojis',description=f'Page 1 out of 3.\n\n{(nl).join(allEmojis[i] for i in range(19))}',color=ctx.author.color)
-        emb2=Page(title="Emojis",description=f'Page 2 out of 3.\n\n{(nl).join(allEmojis[i] for i in range(19,39))}',color=ctx.author.color)
-        emb3=Page(title='Emojis',description=f'Page 3 out of 3.\n\n{(nl).join(allEmojis[i] for i in range(39,len(allEmojis)))}',color=ctx.author.color)
-        menu.add_pages([emb1,emb2,emb3])  #Setting the three pages in the menu
-        await menu.open()  #Sending the menu.
+        ## ==> PAGINATED MENU
+        menu = PaginatedMenu(ctx)
+
+        ## ==> CREATING 3 PAGES FOR MENU
+        emb1 = Page(
+            title='Emojis',
+            description=f'Page 1 out of 3.\n\n{(nl).join(allEmojis[:19])}',
+            color=discord.Color.from_rgb(self.r, self.g, self.b)
+        )
+        emb2 = Page(
+            title="Emojis",
+            description=f'Page 2 out of 3.\n\n{(nl).join(allEmojis[19:39])}',
+            color=discord.Color.from_rgb(self.r, self.g, self.b)
+        )
+        emb3 = Page(
+            title='Emojis',
+            description=f'Page 3 out of 3.\n\n{(nl).join(allEmojis[39:])}',
+            color=discord.Color.from_rgb(self.r, self.g, self.b)
+        )
+        
+        ## ==> SETTING UP THE PAGES
+        menu.add_pages([emb1,emb2,emb3]) 
+        
+        ## ==> SENDING THE MENU
+        await menu.open()
 
 
 def setup(bot):
