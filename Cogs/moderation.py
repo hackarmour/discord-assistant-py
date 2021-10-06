@@ -41,17 +41,19 @@ class Moderation(commands.Cog):
             WHERE guild_id = :guild_id
             """,
             {"guild_id": str(message.guild.id)}
-        )
+        )   
+        
+        if (fetches := c.fetchall()) is None:
+            return
 
-        if (fetches := c.fetchall()) is None: return
-
-        elif fetches[0] == 1:
+        elif fetches[0][0] == 1:
             ## ==> IF THE MESSAGE CONTAINS ILLEGAL WORDS
             if any(word in message.content for word in self.illegal_words):
                 user = message.author
 
                 ## ==> DELETING MESSAGE
-                await message.delete()
+                try: await message.delete()
+                except Exception: return
 
                 ## ==> MUTED ROLE
                 role = discord.utils.get(message.guild.roles,name='Muted')
@@ -281,7 +283,7 @@ class Moderation(commands.Cog):
     async def ToggleAutoMod(self, ctx: commands.Context) -> None:
 
         ## ==> CHECKS
-        if ctx.author.bot(): return
+        if ctx.author.bot: return
 
         c = self.conn.cursor()
 
