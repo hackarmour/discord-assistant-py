@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: E-mail contact
+    url: mailto:staff@hackarmour.tech
+    about: Feel free to mail us regarding any issue or something related to Monoinit.
+  - name: Discord community
+    url: https://discord.gg/mxHtj8q3c4
+    about: Contact us via our Discord community.
